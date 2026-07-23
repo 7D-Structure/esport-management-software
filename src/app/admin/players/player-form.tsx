@@ -13,6 +13,7 @@ type PlayerDefaults = {
   gamertag?: string;
   game?: string;
   inGameRole?: string | null;
+  faceitNickname?: string | null;
   dateOfBirth?: Date | null;
   licenseNumber?: string | null;
   licenseStatus?: string;
@@ -85,6 +86,19 @@ export function PlayerForm({
             className="rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900"
           />
         </div>
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <label htmlFor="faceitNickname" className="text-sm font-medium">
+          Pseudo FaceIT (pour les stats CS2)
+        </label>
+        <input
+          id="faceitNickname"
+          name="faceitNickname"
+          placeholder="ex: s1mple"
+          defaultValue={defaults?.faceitNickname ?? ""}
+          className="rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900"
+        />
       </div>
 
       <div className="grid grid-cols-2 gap-4">

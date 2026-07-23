@@ -10,6 +10,7 @@ const NAV_LINKS = [
   { href: "/admin/costs", label: "Coûts" },
   { href: "/admin/servers", label: "Serveurs" },
   { href: "/admin/documents", label: "Documents" },
+  { href: "/admin/helloasso", label: "HelloAsso" },
 ];
 
 export default async function AdminLayout({

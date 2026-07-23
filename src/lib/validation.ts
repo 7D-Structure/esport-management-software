@@ -124,6 +124,7 @@ export const playerSchema = z.object({
   gamertag: z.string().min(1, "Le pseudo est requis"),
   game: z.enum(GAME_VALUES),
   inGameRole: optionalString,
+  faceitNickname: optionalString,
   dateOfBirth: optionalDate,
   licenseNumber: optionalString,
   licenseStatus: z.enum(LICENSE_STATUS_VALUES).default("NONE"),

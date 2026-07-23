@@ -281,6 +281,8 @@ model Player {
   game       Game
   inGameRole String?
 
+  faceitNickname String?
+
   dateOfBirth DateTime?
 
   licenseNumber    String?

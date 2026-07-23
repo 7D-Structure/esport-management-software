@@ -17,6 +17,7 @@ function readPlayerForm(formData: FormData) {
     gamertag: formData.get("gamertag"),
     game: formData.get("game"),
     inGameRole: formData.get("inGameRole"),
+    faceitNickname: formData.get("faceitNickname"),
     dateOfBirth: formData.get("dateOfBirth"),
     licenseNumber: formData.get("licenseNumber"),
     licenseStatus: formData.get("licenseStatus"),

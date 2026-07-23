@@ -4,6 +4,7 @@ import { requireAdmin } from "@/lib/require-admin";
 import { CONTACT_TYPE_LABELS, DAY_LABELS } from "@/lib/labels";
 import { CONTACT_TYPE_VALUES } from "@/lib/validation";
 import { PlayerForm } from "../player-form";
+import { FaceitStats } from "../faceit-stats";
 import {
   addPlayerAvailability,
   addPlayerContact,
@@ -59,6 +60,10 @@ export default async function EditPlayerPage({
         defaults={player}
         submitLabel="Enregistrer"
       />
+
+      {player.game === "CS2" && (
+        <FaceitStats nickname={player.faceitNickname} />
+      )}
 
       <section className="max-w-2xl space-y-4">
         <h2 className="text-lg font-semibold">Contacts</h2>

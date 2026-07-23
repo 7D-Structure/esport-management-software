@@ -77,6 +77,9 @@ Joueur/Coach (configurations, objectifs, notebook, agenda) pour votre structure 
     Source (CS2)
   - Documents associatifs : catalogue de documents (statuts, PV, règlement, licences...)
     référencés par lien externe (Drive, Nextcloud, PDF public), gérés par l'admin
+  - Stats CS2 (FaceIT) : sur la fiche d'un joueur CS2, affichage des statistiques FaceIT à
+    partir de son pseudo (niveau, elo, matchs, winrate, K/D, HS%)
+  - Synchronisation HelloAsso : import des adhésions HelloAsso comme joueurs (licences)
 
 - **Espace Joueur/Coach** (`/space`, auth required — any authenticated user):
   - Mes configs : stockage de fichiers `.cfg` par jeu, avec téléchargement
@@ -88,5 +91,16 @@ Joueur/Coach (configurations, objectifs, notebook, agenda) pour votre structure 
   lui. Après connexion, `/enter` redirige les rôles `ADMIN`/`STAFF` vers l'espace admin et les
   autres vers `/space`.
 
-Other modules described in the product roadmap (stats CS2 via Leetify/FaceIT, sync HelloAsso)
-are not yet implemented — both require external API credentials.
+## Optional integrations
+
+Both integrations are optional and read their credentials from environment variables. When the
+credentials are absent, the corresponding UI degrades gracefully (a "not configured" notice)
+and no external call is made.
+
+- **FaceIT** (CS2 stats): set `FACEIT_API_KEY`. Stats appear on a CS2 player's detail page
+  once the player has a FaceIT nickname.
+- **HelloAsso** (membership sync): set `HELLOASSO_CLIENT_ID`, `HELLOASSO_CLIENT_SECRET` and
+  `HELLOASSO_ORGANIZATION_SLUG` (and optionally `HELLOASSO_API_BASE` for the sandbox). The sync
+  runs from `/admin/helloasso`.
+
+See `.env.example` for all variables.
