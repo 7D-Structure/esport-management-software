@@ -1,0 +1,168 @@
+// Prisma schema for the esport management platform
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  STAFF
+  COACH
+  PLAYER
+}
+
+enum Game {
+  CS2
+  RAINBOW_SIX_SIEGE
+  OVERWATCH_2
+  VALORANT
+  OTHER
+}
+
+enum LicenseStatus {
+  ACTIVE
+  PENDING
+  EXPIRED
+  NONE
+}
+
+enum StaffRole {
+  MANAGER
+  HEAD_COACH
+  COACH
+  ANALYST
+  ADMIN
+  OTHER
+}
+
+enum ContactType {
+  EMAIL
+  PHONE
+  DISCORD
+  EMERGENCY
+  OTHER
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         UserRole @default(PLAYER)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  player Player?
+  staff  Staff?
+}
+
+model Team {
+  id        String   @id @default(cuid())
+  name      String
+  game      Game
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  players Player[]
+  staff   Staff[]
+
+  @@unique([name, game])
+}
+
+model Player {
+  id     String  @id @default(cuid())
+  userId String? @unique
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  firstName  String
+  lastName   String
+  gamertag   String
+  game       Game
+  inGameRole String?
+
+  dateOfBirth DateTime?
+
+  licenseNumber    String?
+  licenseStatus    LicenseStatus @default(NONE)
+  licenseExpiresAt DateTime?
+
+  helloAssoMemberId String? @unique
+
+  teamId String?
+  team   Team?   @relation(fields: [teamId], references: [id], onDelete: SetNull)
+
+  contacts       Contact[]
+  availabilities Availability[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([teamId])
+  @@index([lastName, firstName])
+}
+
+model Staff {
+  id     String  @id @default(cuid())
+  userId String? @unique
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  firstName String
+  lastName  String
+  role      StaffRole @default(OTHER)
+
+  teamId String?
+  team   Team?   @relation(fields: [teamId], references: [id], onDelete: SetNull)
+
+  contacts       Contact[]
+  availabilities Availability[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([teamId])
+  @@index([lastName, firstName])
+}
+
+model Contact {
+  id    String      @id @default(cuid())
+  type  ContactType
+  value String
+  label String?
+
+  playerId String?
+  player   Player? @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  staffId String?
+  staff   Staff?  @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([playerId])
+  @@index([staffId])
+}
+
+model Availability {
+  id String @id @default(cuid())
+
+  dayOfWeek Int // 0 = Sunday ... 6 = Saturday
+  startTime String // "HH:mm"
+  endTime   String // "HH:mm"
+  note      String?
+
+  playerId String?
+  player   Player? @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  staffId String?
+  staff   Staff?  @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([playerId])
+  @@index([staffId])
+}
