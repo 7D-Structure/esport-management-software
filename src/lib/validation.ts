@@ -54,6 +54,8 @@ export const SERVER_STATUS_VALUES = [
   "UNKNOWN",
 ] as const;
 
+export const GOAL_STATUS_VALUES = ["TODO", "IN_PROGRESS", "DONE"] as const;
+
 export const FINANCE_TYPE_VALUES = ["EXPENSE", "INCOME"] as const;
 
 export const FINANCE_CATEGORY_VALUES = [
@@ -79,6 +81,24 @@ const optionalString = z
   .string()
   .optional()
   .transform((value) => (value && value.length > 0 ? value : undefined));
+
+export const configFileSchema = z.object({
+  name: z.string().min(1, "Le nom est requis"),
+  game: z.enum(GAME_VALUES),
+  content: z.string().default(""),
+});
+
+export const goalSchema = z.object({
+  title: z.string().min(1, "Le titre est requis"),
+  description: optionalString,
+  targetDate: optionalDate,
+  status: z.enum(GOAL_STATUS_VALUES).default("TODO"),
+});
+
+export const noteSchema = z.object({
+  title: z.string().min(1, "Le titre est requis"),
+  content: z.string().default(""),
+});
 
 export const playerSchema = z.object({
   firstName: z.string().min(1, "Le prénom est requis"),

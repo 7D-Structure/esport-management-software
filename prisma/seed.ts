@@ -20,6 +20,23 @@ async function main() {
   });
 
   console.log(`Admin user ready: ${admin.email}`);
+
+  const playerEmail = process.env.SEED_PLAYER_EMAIL ?? "joueur@example.com";
+  const playerPassword = process.env.SEED_PLAYER_PASSWORD ?? "changeme123";
+  const playerHash = await bcrypt.hash(playerPassword, 10);
+
+  const player = await prisma.user.upsert({
+    where: { email: playerEmail },
+    update: {},
+    create: {
+      email: playerEmail,
+      name: "Joueur Démo",
+      role: "PLAYER",
+      passwordHash: playerHash,
+    },
+  });
+
+  console.log(`Player user ready: ${player.email}`);
 }
 
 main()

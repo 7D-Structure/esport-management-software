@@ -14,10 +14,10 @@ export default function Home() {
           esport.
         </p>
         <Link
-          href="/admin/players"
+          href="/enter"
           className="flex h-12 items-center justify-center rounded-full bg-foreground px-6 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc]"
         >
-          Accéder à l&apos;administration
+          Accéder à mon espace
         </Link>
       </main>
     </div>

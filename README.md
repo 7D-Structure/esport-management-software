@@ -36,8 +36,10 @@ Joueur/Coach (configurations, objectifs, notebook, agenda) pour votre structure 
    npm run db:seed
    ```
 
-   By default the seed creates `admin@example.com` / `changeme123`. Override with
-   `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` env vars before seeding.
+   By default the seed creates an admin (`admin@example.com`) and a player
+   (`joueur@example.com`), both with password `changeme123`. Override with the
+   `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` / `SEED_PLAYER_EMAIL` /
+   `SEED_PLAYER_PASSWORD` env vars before seeding.
 
 4. Start the dev server:
 
@@ -74,5 +76,14 @@ Joueur/Coach (configurations, objectifs, notebook, agenda) pour votre structure 
     serveur/RCON, hébergeur, localisation), avec commande de connexion console pour les jeux
     Source (CS2)
 
+- **Espace Joueur/Coach** (`/space`, auth required — any authenticated user):
+  - Mes configs : stockage de fichiers `.cfg` par jeu, avec téléchargement
+  - Mes objectifs : objectifs personnels avec statut (à faire / en cours / atteint) et échéance
+  - Mon notebook : notes personnelles
+
+  Chaque ressource appartient à l'utilisateur connecté et n'est visible que par lui. Après
+  connexion, `/enter` redirige les rôles `ADMIN`/`STAFF` vers l'espace admin et les autres
+  vers `/space`.
+
 Other modules described in the product roadmap (stats CS2 via Leetify/FaceIT, sync HelloAsso,
-documents associatifs, espace joueur/coach) are not yet implemented.
+documents associatifs) are not yet implemented.

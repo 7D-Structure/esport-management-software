@@ -79,6 +79,18 @@ export const SERVER_STATUS_COLORS: Record<string, string> = {
   UNKNOWN: "bg-neutral-400",
 };
 
+export const GOAL_STATUS_LABELS: Record<string, string> = {
+  TODO: "À faire",
+  IN_PROGRESS: "En cours",
+  DONE: "Atteint",
+};
+
+export const GOAL_STATUS_COLORS: Record<string, string> = {
+  TODO: "bg-neutral-400",
+  IN_PROGRESS: "bg-amber-500",
+  DONE: "bg-emerald-500",
+};
+
 export const FINANCE_TYPE_LABELS: Record<string, string> = {
   EXPENSE: "Dépense",
   INCOME: "Recette",

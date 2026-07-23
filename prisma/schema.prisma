@@ -71,6 +71,12 @@ enum ServerStatus {
   UNKNOWN
 }
 
+enum GoalStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
 enum FinanceType {
   EXPENSE
   INCOME
@@ -101,6 +107,55 @@ model User {
 
   player Player?
   staff  Staff?
+
+  configFiles ConfigFile[]
+  goals       Goal[]
+  notes       Note[]
+}
+
+model ConfigFile {
+  id      String @id @default(cuid())
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name    String
+  game    Game
+  content String @default("")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Goal {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title       String
+  description String?
+  targetDate  DateTime?
+  status      GoalStatus @default(TODO)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Note {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title   String
+  content String @default("")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
 }
 
 model Team {

@@ -7,7 +7,7 @@ import { signIn } from "next-auth/react";
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") ?? "/admin/players";
+  const callbackUrl = searchParams.get("callbackUrl") ?? "/enter";
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
