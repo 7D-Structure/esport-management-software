@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/require-admin";
+import { canManageOrg } from "@/lib/org";
 import { signOut } from "@/auth";
+import { OrgSwitcher } from "./org-switcher";
 
 const NAV_LINKS = [
   { href: "/admin/players", label: "Joueurs" },
@@ -13,25 +15,22 @@ const NAV_LINKS = [
   { href: "/admin/helloasso", label: "HelloAsso" },
 ];
 
-// Account & role management is restricted to ADMIN.
-const ADMIN_ONLY_LINKS = [{ href: "/admin/users", label: "Comptes" }];
-
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await requireAdmin();
+  const { session, organization, membership, memberships } =
+    await requireAdmin();
 
-  const navLinks =
-    session.user.role === "ADMIN"
-      ? [...NAV_LINKS, ...ADMIN_ONLY_LINKS]
-      : NAV_LINKS;
+  const navLinks = canManageOrg(membership.role)
+    ? [...NAV_LINKS, { href: "/admin/members", label: "Membres" }]
+    : NAV_LINKS;
 
   return (
     <div className="mx-auto flex w-full min-h-screen max-w-6xl flex-col gap-6 p-6">
-      <header className="flex items-center justify-between border-b border-neutral-200 pb-4 dark:border-neutral-800">
-        <nav className="flex items-center gap-6">
+      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-200 pb-4 dark:border-neutral-800">
+        <nav className="flex flex-wrap items-center gap-x-6 gap-y-2">
           <span className="text-lg font-bold">Administration</span>
           {navLinks.map((link) => (
             <Link
@@ -44,6 +43,18 @@ export default async function AdminLayout({
           ))}
         </nav>
         <div className="flex items-center gap-4 text-sm text-neutral-500">
+          <OrgSwitcher
+            memberships={memberships.map((m) => ({
+              id: m.organizationId,
+              name: m.organization.name,
+            }))}
+            activeId={organization.id}
+          />
+          {session.user.isSiteAdmin && (
+            <Link href="/site" className="hover:underline">
+              Site
+            </Link>
+          )}
           <span>{session.user.name}</span>
           <form
             action={async () => {

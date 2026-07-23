@@ -4,9 +4,10 @@ import { requireAdmin } from "@/lib/require-admin";
 import { DOCUMENT_CATEGORY_LABELS } from "@/lib/labels";
 
 export default async function DocumentsPage() {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
 
   const documents = await prisma.document.findMany({
+    where: { organizationId: organization.id },
     orderBy: [{ category: "asc" }, { title: "asc" }],
   });
 

@@ -1,26 +1,21 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
+import { requireOrgAdmin } from "@/lib/org";
 
-const ADMIN_ROLES = new Set(["ADMIN", "STAFF", "MANAGER", "COACH"]);
-
+// Organization admin area: requires membership in the active organization.
+// Returns the active org context (session, organization, membership, memberships).
 export async function requireAdmin() {
-  const session = await auth();
-
-  if (!session?.user || !ADMIN_ROLES.has(session.user.role)) {
-    redirect("/login");
-  }
-
-  return session;
+  return requireOrgAdmin();
 }
 
-// Stricter guard for sensitive management (accounts & roles): ADMIN only.
-export async function requireSuperAdmin() {
+// Stricter guard for site-wide management: site admins only.
+export async function requireSiteAdmin() {
   const session = await auth();
 
   if (!session?.user) {
     redirect("/login");
   }
-  if (session.user.role !== "ADMIN") {
+  if (!session.user.isSiteAdmin) {
     redirect("/admin/players");
   }
 

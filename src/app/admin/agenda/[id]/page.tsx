@@ -9,12 +9,15 @@ export default async function EditEventPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
   const { id } = await params;
 
   const [event, teams] = await Promise.all([
-    prisma.event.findUnique({ where: { id } }),
-    prisma.team.findMany({ orderBy: { name: "asc" } }),
+    prisma.event.findFirst({ where: { id, organizationId: organization.id } }),
+    prisma.team.findMany({
+      where: { organizationId: organization.id },
+      orderBy: { name: "asc" },
+    }),
   ]);
 
   if (!event) {

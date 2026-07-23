@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { requireSuperAdmin } from "@/lib/require-admin";
+import { requireSiteAdmin } from "@/lib/require-admin";
 import { USER_ROLE_LABELS } from "@/lib/labels";
 
 export default async function UsersPage({
@@ -8,7 +8,7 @@ export default async function UsersPage({
 }: {
   searchParams: Promise<{ error?: string }>;
 }) {
-  const session = await requireSuperAdmin();
+  const session = await requireSiteAdmin();
   const { error } = await searchParams;
 
   const users = await prisma.user.findMany({
@@ -29,7 +29,7 @@ export default async function UsersPage({
           </p>
         </div>
         <Link
-          href="/admin/users/new"
+          href="/site/users/new"
           className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white dark:bg-white dark:text-neutral-900"
         >
           + Nouveau compte
@@ -59,7 +59,7 @@ export default async function UsersPage({
             >
               <td className="py-2">
                 <Link
-                  href={`/admin/users/${user.id}`}
+                  href={`/site/users/${user.id}`}
                   className="font-medium hover:underline"
                 >
                   {user.name}

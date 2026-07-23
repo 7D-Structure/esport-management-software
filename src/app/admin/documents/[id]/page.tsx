@@ -9,10 +9,12 @@ export default async function EditDocumentPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
   const { id } = await params;
 
-  const doc = await prisma.document.findUnique({ where: { id } });
+  const doc = await prisma.document.findFirst({
+    where: { id, organizationId: organization.id },
+  });
 
   if (!doc) {
     notFound();

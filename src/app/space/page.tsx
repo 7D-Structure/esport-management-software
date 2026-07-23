@@ -64,6 +64,20 @@ export default async function SpaceHomePage() {
           </Link>
         ))}
       </div>
+
+      <div className="rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
+        <h2 className="font-medium">Gérer une équipe / association ?</h2>
+        <p className="mt-1 text-sm text-neutral-500">
+          Créez votre organisation pour gérer joueurs, staff, agenda, coûts et
+          plus.
+        </p>
+        <Link
+          href="/onboarding/organization"
+          className="mt-3 inline-flex rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white dark:bg-white dark:text-neutral-900"
+        >
+          Créer une organisation
+        </Link>
+      </div>
     </div>
   );
 }

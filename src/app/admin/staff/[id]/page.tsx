@@ -18,15 +18,18 @@ export default async function EditStaffPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
   const { id } = await params;
 
   const [staff, teams] = await Promise.all([
-    prisma.staff.findUnique({
-      where: { id },
+    prisma.staff.findFirst({
+      where: { id, organizationId: organization.id },
       include: { contacts: true, availabilities: true },
     }),
-    prisma.team.findMany({ orderBy: { name: "asc" } }),
+    prisma.team.findMany({
+      where: { organizationId: organization.id },
+      orderBy: { name: "asc" },
+    }),
   ]);
 
   if (!staff) {

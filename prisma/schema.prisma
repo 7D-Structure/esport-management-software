@@ -18,6 +18,15 @@ enum UserRole {
   PLAYER
 }
 
+// Role of a user within a single organization (tenant).
+enum OrgRole {
+  OWNER
+  ADMIN
+  MANAGER
+  COACH
+  STAFF
+}
+
 enum Game {
   CS2
   RAINBOW_SIX_SIEGE
@@ -114,6 +123,8 @@ model User {
   passwordHash String
   name         String
   role         UserRole @default(PLAYER)
+  // Site-wide super-admin (owns/oversees the whole platform).
+  isSiteAdmin  Boolean  @default(false)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -124,11 +135,46 @@ model User {
   goals       Goal[]
   notes       Note[]
 
+  orgMemberships OrganizationMembership[]
+
   playerProfile       PlayerProfile?
   rostersOwned        Roster[]           @relation("RosterOwner")
   rosterMemberships   RosterMembership[] @relation("RosterMemberships")
   invitationsSent     Invitation[]       @relation("InvitationsSent")
   invitationsReceived Invitation[]       @relation("InvitationsReceived")
+}
+
+// A tenant: an association/club that manages its own players, teams, etc.
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberships OrganizationMembership[]
+
+  teams          Team[]
+  players        Player[]
+  staff          Staff[]
+  events         Event[]
+  financeEntries FinanceEntry[]
+  gameServers    GameServer[]
+  documents      Document[]
+}
+
+model OrganizationMembership {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  role      OrgRole  @default(STAFF)
+  createdAt DateTime @default(now())
+
+  @@unique([organizationId, userId])
+  @@index([userId])
 }
 
 enum InvitationStatus {
@@ -260,7 +306,10 @@ model Note {
 }
 
 model Document {
-  id          String           @id @default(cuid())
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
   title       String
   category    DocumentCategory @default(OTHER)
   description String?
@@ -269,11 +318,15 @@ model Document {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([organizationId])
   @@index([category])
 }
 
 model Team {
-  id        String   @id @default(cuid())
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
   name      String
   game      Game
   createdAt DateTime @default(now())
@@ -285,11 +338,15 @@ model Team {
   financeEntries FinanceEntry[]
   gameServers    GameServer[]
 
-  @@unique([name, game])
+  @@unique([organizationId, name, game])
+  @@index([organizationId])
 }
 
 model Event {
-  id    String    @id @default(cuid())
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
   title String
   type  EventType @default(SCRIM)
 
@@ -308,12 +365,16 @@ model Event {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([organizationId])
   @@index([teamId])
   @@index([startsAt])
 }
 
 model FinanceEntry {
-  id       String          @id @default(cuid())
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
   label    String
   type     FinanceType
   category FinanceCategory @default(OTHER)
@@ -330,12 +391,16 @@ model FinanceEntry {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([organizationId])
   @@index([teamId])
   @@index([date])
 }
 
 model GameServer {
-  id     String       @id @default(cuid())
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
   name   String
   game   Game
   status ServerStatus @default(UNKNOWN)
@@ -357,11 +422,15 @@ model GameServer {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([organizationId])
   @@index([teamId])
 }
 
 model Player {
-  id     String  @id @default(cuid())
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
   userId String? @unique
   user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 
@@ -390,12 +459,16 @@ model Player {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([organizationId])
   @@index([teamId])
   @@index([lastName, firstName])
 }
 
 model Staff {
-  id     String  @id @default(cuid())
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
   userId String? @unique
   user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 
@@ -412,6 +485,7 @@ model Staff {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([organizationId])
   @@index([teamId])
   @@index([lastName, firstName])
 }

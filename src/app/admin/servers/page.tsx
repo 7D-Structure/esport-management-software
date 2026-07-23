@@ -8,9 +8,10 @@ import {
 } from "@/lib/labels";
 
 export default async function ServersPage() {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
 
   const servers = await prisma.gameServer.findMany({
+    where: { organizationId: organization.id },
     orderBy: [{ game: "asc" }, { name: "asc" }],
     include: { team: true },
   });

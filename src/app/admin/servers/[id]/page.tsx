@@ -22,12 +22,17 @@ export default async function EditServerPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
   const { id } = await params;
 
   const [server, teams] = await Promise.all([
-    prisma.gameServer.findUnique({ where: { id } }),
-    prisma.team.findMany({ orderBy: { name: "asc" } }),
+    prisma.gameServer.findFirst({
+      where: { id, organizationId: organization.id },
+    }),
+    prisma.team.findMany({
+      where: { organizationId: organization.id },
+      orderBy: { name: "asc" },
+    }),
   ]);
 
   if (!server) {

@@ -23,30 +23,37 @@ function readServerForm(formData: FormData) {
 }
 
 export async function createServer(formData: FormData) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
 
   const data = readServerForm(formData);
-  const server = await prisma.gameServer.create({ data });
+  const server = await prisma.gameServer.create({
+    data: { ...data, organizationId: organization.id },
+  });
 
   revalidatePath("/admin/servers");
   redirect(`/admin/servers/${server.id}`);
 }
 
 export async function updateServer(serverId: string, formData: FormData) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
 
   const data = readServerForm(formData);
-  await prisma.gameServer.update({ where: { id: serverId }, data });
+  await prisma.gameServer.updateMany({
+    where: { id: serverId, organizationId: organization.id },
+    data,
+  });
 
   revalidatePath("/admin/servers");
   revalidatePath(`/admin/servers/${serverId}`);
 }
 
 export async function deleteServer(formData: FormData) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
 
   const id = String(formData.get("id"));
-  await prisma.gameServer.delete({ where: { id } });
+  await prisma.gameServer.deleteMany({
+    where: { id, organizationId: organization.id },
+  });
 
   revalidatePath("/admin/servers");
   redirect("/admin/servers");

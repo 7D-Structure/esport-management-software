@@ -76,6 +76,23 @@ export const registerSchema = z.object({
   password: z.string().min(8, "Mot de passe : 8 caractères minimum"),
 });
 
+export const organizationSchema = z.object({
+  name: z.string().min(1, "Le nom de l'organisation est requis"),
+});
+
+export const ORG_ROLE_VALUES = [
+  "OWNER",
+  "ADMIN",
+  "MANAGER",
+  "COACH",
+  "STAFF",
+] as const;
+
+export const orgMemberSchema = z.object({
+  email: z.string().email("Email invalide"),
+  role: z.enum(ORG_ROLE_VALUES).default("STAFF"),
+});
+
 export const userUpdateSchema = z.object({
   name: z.string().min(1, "Le nom est requis"),
   email: z.string().email("Email invalide"),

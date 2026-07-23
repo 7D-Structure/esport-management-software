@@ -4,9 +4,10 @@ import { requireAdmin } from "@/lib/require-admin";
 import { GAME_LABELS, LICENSE_STATUS_LABELS } from "@/lib/labels";
 
 export default async function PlayersPage() {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
 
   const players = await prisma.player.findMany({
+    where: { organizationId: organization.id },
     orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
     include: { team: true },
   });

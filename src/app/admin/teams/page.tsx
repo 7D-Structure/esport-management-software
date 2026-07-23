@@ -5,9 +5,10 @@ import { GAME_VALUES } from "@/lib/validation";
 import { createTeam, deleteTeam } from "./actions";
 
 export default async function TeamsPage() {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
 
   const teams = await prisma.team.findMany({
+    where: { organizationId: organization.id },
     orderBy: { name: "asc" },
     include: {
       _count: { select: { players: true, staff: true } },

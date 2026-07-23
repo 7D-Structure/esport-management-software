@@ -26,38 +26,54 @@ function readPlayerForm(formData: FormData) {
   });
 }
 
+// Confirm a player belongs to the active organization before mutating children.
+async function playerInOrg(playerId: string, organizationId: string) {
+  return prisma.player.findFirst({
+    where: { id: playerId, organizationId },
+    select: { id: true },
+  });
+}
+
 export async function createPlayer(formData: FormData) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
 
   const data = readPlayerForm(formData);
-  const player = await prisma.player.create({ data });
+  const player = await prisma.player.create({
+    data: { ...data, organizationId: organization.id },
+  });
 
   revalidatePath("/admin/players");
   redirect(`/admin/players/${player.id}`);
 }
 
 export async function updatePlayer(playerId: string, formData: FormData) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
 
   const data = readPlayerForm(formData);
-  await prisma.player.update({ where: { id: playerId }, data });
+  await prisma.player.updateMany({
+    where: { id: playerId, organizationId: organization.id },
+    data,
+  });
 
   revalidatePath("/admin/players");
   revalidatePath(`/admin/players/${playerId}`);
 }
 
 export async function deletePlayer(formData: FormData) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
 
   const id = String(formData.get("id"));
-  await prisma.player.delete({ where: { id } });
+  await prisma.player.deleteMany({
+    where: { id, organizationId: organization.id },
+  });
 
   revalidatePath("/admin/players");
   redirect("/admin/players");
 }
 
 export async function addPlayerContact(playerId: string, formData: FormData) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
+  if (!(await playerInOrg(playerId, organization.id))) return;
 
   const data = contactSchema.parse({
     type: formData.get("type"),
@@ -73,10 +89,11 @@ export async function deletePlayerContact(
   playerId: string,
   formData: FormData,
 ) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
+  if (!(await playerInOrg(playerId, organization.id))) return;
 
   const id = String(formData.get("id"));
-  await prisma.contact.delete({ where: { id } });
+  await prisma.contact.deleteMany({ where: { id, playerId } });
   revalidatePath(`/admin/players/${playerId}`);
 }
 
@@ -84,7 +101,8 @@ export async function addPlayerAvailability(
   playerId: string,
   formData: FormData,
 ) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
+  if (!(await playerInOrg(playerId, organization.id))) return;
 
   const data = availabilitySchema.parse({
     dayOfWeek: formData.get("dayOfWeek"),
@@ -101,9 +119,10 @@ export async function deletePlayerAvailability(
   playerId: string,
   formData: FormData,
 ) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
+  if (!(await playerInOrg(playerId, organization.id))) return;
 
   const id = String(formData.get("id"));
-  await prisma.availability.delete({ where: { id } });
+  await prisma.availability.deleteMany({ where: { id, playerId } });
   revalidatePath(`/admin/players/${playerId}`);
 }

@@ -1,4 +1,4 @@
-import { requireSuperAdmin } from "@/lib/require-admin";
+import { requireSiteAdmin } from "@/lib/require-admin";
 import { createUser } from "../actions";
 import { UserForm } from "../user-form";
 
@@ -7,7 +7,7 @@ export default async function NewUserPage({
 }: {
   searchParams: Promise<{ error?: string }>;
 }) {
-  await requireSuperAdmin();
+  await requireSiteAdmin();
   const { error } = await searchParams;
 
   return (

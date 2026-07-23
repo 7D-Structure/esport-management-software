@@ -19,38 +19,53 @@ function readStaffForm(formData: FormData) {
   });
 }
 
+async function staffInOrg(staffId: string, organizationId: string) {
+  return prisma.staff.findFirst({
+    where: { id: staffId, organizationId },
+    select: { id: true },
+  });
+}
+
 export async function createStaff(formData: FormData) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
 
   const data = readStaffForm(formData);
-  const staff = await prisma.staff.create({ data });
+  const staff = await prisma.staff.create({
+    data: { ...data, organizationId: organization.id },
+  });
 
   revalidatePath("/admin/staff");
   redirect(`/admin/staff/${staff.id}`);
 }
 
 export async function updateStaff(staffId: string, formData: FormData) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
 
   const data = readStaffForm(formData);
-  await prisma.staff.update({ where: { id: staffId }, data });
+  await prisma.staff.updateMany({
+    where: { id: staffId, organizationId: organization.id },
+    data,
+  });
 
   revalidatePath("/admin/staff");
   revalidatePath(`/admin/staff/${staffId}`);
 }
 
 export async function deleteStaff(formData: FormData) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
 
   const id = String(formData.get("id"));
-  await prisma.staff.delete({ where: { id } });
+  await prisma.staff.deleteMany({
+    where: { id, organizationId: organization.id },
+  });
 
   revalidatePath("/admin/staff");
   redirect("/admin/staff");
 }
 
 export async function addStaffContact(staffId: string, formData: FormData) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
+  if (!(await staffInOrg(staffId, organization.id))) return;
 
   const data = contactSchema.parse({
     type: formData.get("type"),
@@ -63,10 +78,11 @@ export async function addStaffContact(staffId: string, formData: FormData) {
 }
 
 export async function deleteStaffContact(staffId: string, formData: FormData) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
+  if (!(await staffInOrg(staffId, organization.id))) return;
 
   const id = String(formData.get("id"));
-  await prisma.contact.delete({ where: { id } });
+  await prisma.contact.deleteMany({ where: { id, staffId } });
   revalidatePath(`/admin/staff/${staffId}`);
 }
 
@@ -74,7 +90,8 @@ export async function addStaffAvailability(
   staffId: string,
   formData: FormData,
 ) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
+  if (!(await staffInOrg(staffId, organization.id))) return;
 
   const data = availabilitySchema.parse({
     dayOfWeek: formData.get("dayOfWeek"),
@@ -91,9 +108,10 @@ export async function deleteStaffAvailability(
   staffId: string,
   formData: FormData,
 ) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
+  if (!(await staffInOrg(staffId, organization.id))) return;
 
   const id = String(formData.get("id"));
-  await prisma.availability.delete({ where: { id } });
+  await prisma.availability.deleteMany({ where: { id, staffId } });
   revalidatePath(`/admin/staff/${staffId}`);
 }

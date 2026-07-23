@@ -12,7 +12,7 @@ function licenseStatusFor(state?: string): "ACTIVE" | "PENDING" {
 }
 
 export async function syncHelloAssoMembers() {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
 
   const result = await getHelloAssoMembers();
 
@@ -25,8 +25,11 @@ export async function syncHelloAssoMembers() {
   let updated = 0;
 
   for (const member of result.members) {
-    const existing = await prisma.player.findUnique({
-      where: { helloAssoMemberId: member.memberId },
+    const existing = await prisma.player.findFirst({
+      where: {
+        helloAssoMemberId: member.memberId,
+        organizationId: organization.id,
+      },
     });
 
     const licenseStatus = licenseStatusFor(member.state);
@@ -46,6 +49,7 @@ export async function syncHelloAssoMembers() {
         `${member.firstName} ${member.lastName}`.trim() || "Membre HelloAsso";
       await prisma.player.create({
         data: {
+          organizationId: organization.id,
           firstName: member.firstName || "—",
           lastName: member.lastName || "—",
           gamertag: fallbackTag,

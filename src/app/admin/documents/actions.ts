@@ -16,10 +16,12 @@ function readDocumentForm(formData: FormData) {
 }
 
 export async function createDocument(formData: FormData) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
 
   const data = readDocumentForm(formData);
-  const doc = await prisma.document.create({ data });
+  const doc = await prisma.document.create({
+    data: { ...data, organizationId: organization.id },
+  });
 
   revalidatePath("/admin/documents");
   revalidatePath("/space/documents");
@@ -27,10 +29,13 @@ export async function createDocument(formData: FormData) {
 }
 
 export async function updateDocument(documentId: string, formData: FormData) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
 
   const data = readDocumentForm(formData);
-  await prisma.document.update({ where: { id: documentId }, data });
+  await prisma.document.updateMany({
+    where: { id: documentId, organizationId: organization.id },
+    data,
+  });
 
   revalidatePath("/admin/documents");
   revalidatePath(`/admin/documents/${documentId}`);
@@ -38,10 +43,12 @@ export async function updateDocument(documentId: string, formData: FormData) {
 }
 
 export async function deleteDocument(formData: FormData) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
 
   const id = String(formData.get("id"));
-  await prisma.document.delete({ where: { id } });
+  await prisma.document.deleteMany({
+    where: { id, organizationId: organization.id },
+  });
 
   revalidatePath("/admin/documents");
   revalidatePath("/space/documents");

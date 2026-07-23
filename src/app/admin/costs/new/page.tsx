@@ -4,9 +4,12 @@ import { createFinanceEntry } from "../actions";
 import { FinanceForm } from "../finance-form";
 
 export default async function NewFinanceEntryPage() {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
 
-  const teams = await prisma.team.findMany({ orderBy: { name: "asc" } });
+  const teams = await prisma.team.findMany({
+    where: { organizationId: organization.id },
+    orderBy: { name: "asc" },
+  });
 
   return (
     <div className="space-y-6">

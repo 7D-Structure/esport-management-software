@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
+import { prisma } from "@/lib/prisma";
 
-// Post-login landing that routes users to the right space based on their role.
+// Post-login landing that routes users based on their organization membership.
 export default async function EnterPage() {
   const session = await auth();
 
@@ -9,9 +10,12 @@ export default async function EnterPage() {
     redirect("/login");
   }
 
-  // Management roles land in the admin area; coaches and players in their space.
-  const role = session.user.role;
-  if (role === "ADMIN" || role === "STAFF" || role === "MANAGER") {
+  const membershipCount = await prisma.organizationMembership.count({
+    where: { userId: session.user.id },
+  });
+
+  // Members of an organization go to its admin area; everyone else to /space.
+  if (membershipCount > 0) {
     redirect("/admin/players");
   }
 

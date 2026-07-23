@@ -4,9 +4,10 @@ import { requireAdmin } from "@/lib/require-admin";
 import { STAFF_ROLE_LABELS } from "@/lib/labels";
 
 export default async function StaffPage() {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
 
   const staffMembers = await prisma.staff.findMany({
+    where: { organizationId: organization.id },
     orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
     include: { team: true },
   });

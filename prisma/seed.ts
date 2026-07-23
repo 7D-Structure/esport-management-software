@@ -10,16 +10,36 @@ async function main() {
 
   const admin = await prisma.user.upsert({
     where: { email },
-    update: {},
+    update: { isSiteAdmin: true },
     create: {
       email,
       name: "Administrateur",
       role: "ADMIN",
+      isSiteAdmin: true,
       passwordHash,
     },
   });
 
   console.log(`Admin user ready: ${admin.email}`);
+
+  // Default organization (also created by the migration; ensure it exists).
+  const organization = await prisma.organization.upsert({
+    where: { slug: "mon-association" },
+    update: {},
+    create: { name: "Mon association", slug: "mon-association" },
+  });
+
+  async function addMembership(userId: string, role: "OWNER" | "MANAGER" | "COACH") {
+    await prisma.organizationMembership.upsert({
+      where: {
+        organizationId_userId: { organizationId: organization.id, userId },
+      },
+      update: { role },
+      create: { organizationId: organization.id, userId, role },
+    });
+  }
+
+  await addMembership(admin.id, "OWNER");
 
   const playerEmail = process.env.SEED_PLAYER_EMAIL ?? "joueur@example.com";
   const playerPassword = process.env.SEED_PLAYER_PASSWORD ?? "changeme123";
@@ -69,6 +89,10 @@ async function main() {
   });
 
   console.log(`Manager user ready: ${manager.email}`);
+
+  await addMembership(manager.id, "MANAGER");
+  await addMembership(player2.id, "COACH");
+  console.log(`Default organization ready: ${organization.slug}`);
 }
 
 main()

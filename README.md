@@ -63,7 +63,23 @@ Joueur/Coach (configurations, objectifs, notebook, agenda) pour votre structure 
 
 ## Current features
 
-- **Espace Administration** (`/admin`, auth required — roles `ADMIN`, `STAFF`, `MANAGER`, `COACH`):
+### Multi-organisations (multi-tenant)
+
+Le site est **multi-locataire** : chaque organisation (association/club) a son espace
+d'administration **isolé** (ses joueurs, staff, équipes, agenda, coûts, serveurs, documents ne
+sont visibles que dans son organisation).
+
+- **Création en libre-service** : tout utilisateur connecté peut créer son organisation
+  (`/onboarding/organization`) et en devient le propriétaire (`OWNER`).
+- **Rôles d'organisation** (`OrgRole`) : `OWNER` > `ADMIN` > `MANAGER` > `COACH` > `STAFF`.
+  Le propriétaire/admin gère les membres de l'org (`/admin/members`).
+- **Organisation active** : un utilisateur peut appartenir à plusieurs organisations et bascule
+  entre elles via le sélecteur dans l'en-tête de l'admin.
+- **Super-admin du site** (`/site`, `isSiteAdmin`) : vue et gestion de **toutes** les
+  organisations et de **tous** les comptes du site.
+- Le **marché du recrutement** (LFT / Player & Team Finder) reste **global** (inter-organisations).
+
+- **Espace Administration d'une organisation** (`/admin`, réservé aux membres de l'organisation active) :
   - Gestion des équipes (par jeu : CS2, Rainbow Six Siege, Overwatch 2, Valorant, ...), avec le
     responsable de chaque équipe (le membre du staff ayant le rôle `MANAGER`)
   - Gestion des joueurs : licences, rôle en jeu, contacts, disponibilités
@@ -78,9 +94,12 @@ Joueur/Coach (configurations, objectifs, notebook, agenda) pour votre structure 
     Source (CS2)
   - Documents associatifs : catalogue de documents (statuts, PV, règlement, licences...)
     référencés par lien externe (Drive, Nextcloud, PDF public), gérés par l'admin
-  - Gestion des comptes (réservée au rôle `ADMIN`) : création/édition/suppression des comptes
-    utilisateurs et de leur rôle de compte, avec garde-fous (email unique, pas d'auto-suppression
-    ni de changement de son propre rôle)
+  - Gestion des membres de l'organisation (`/admin/members`, propriétaire/admin) : ajout d'un
+    compte existant par email avec un rôle d'organisation, changement de rôle, retrait
+
+La gestion **globale** des comptes du site (création/édition/suppression) est dans l'espace
+super-admin `/site/users`, avec garde-fous (email unique, pas d'auto-suppression ni de
+changement de son propre rôle).
   - Stats CS2 (FaceIT) : sur la fiche d'un joueur CS2, affichage des statistiques FaceIT à
     partir de son pseudo (niveau, elo, matchs, winrate, K/D, HS%)
   - Synchronisation HelloAsso : import des adhésions HelloAsso comme joueurs (licences)

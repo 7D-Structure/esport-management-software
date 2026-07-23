@@ -4,11 +4,11 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { requireSuperAdmin } from "@/lib/require-admin";
+import { requireSiteAdmin } from "@/lib/require-admin";
 import { userCreateSchema, userUpdateSchema } from "@/lib/validation";
 
 export async function createUser(formData: FormData) {
-  await requireSuperAdmin();
+  await requireSiteAdmin();
 
   const data = userCreateSchema.parse({
     name: formData.get("name"),
@@ -22,7 +22,7 @@ export async function createUser(formData: FormData) {
   });
   if (existing) {
     redirect(
-      `/admin/users/new?error=${encodeURIComponent("Cet email est déjà utilisé.")}`,
+      `/site/users/new?error=${encodeURIComponent("Cet email est déjà utilisé.")}`,
     );
   }
 
@@ -36,12 +36,12 @@ export async function createUser(formData: FormData) {
     },
   });
 
-  revalidatePath("/admin/users");
-  redirect("/admin/users");
+  revalidatePath("/site/users");
+  redirect("/site/users");
 }
 
 export async function updateUser(userId: string, formData: FormData) {
-  const session = await requireSuperAdmin();
+  const session = await requireSiteAdmin();
 
   const data = userUpdateSchema.parse({
     name: formData.get("name"),
@@ -53,7 +53,7 @@ export async function updateUser(userId: string, formData: FormData) {
   // Prevent an admin from demoting themselves and losing access.
   if (userId === session.user.id && data.role !== "ADMIN") {
     redirect(
-      `/admin/users/${userId}?error=${encodeURIComponent("Vous ne pouvez pas changer votre propre rôle.")}`,
+      `/site/users/${userId}?error=${encodeURIComponent("Vous ne pouvez pas changer votre propre rôle.")}`,
     );
   }
 
@@ -63,7 +63,7 @@ export async function updateUser(userId: string, formData: FormData) {
   });
   if (emailOwner && emailOwner.id !== userId) {
     redirect(
-      `/admin/users/${userId}?error=${encodeURIComponent("Cet email est déjà utilisé.")}`,
+      `/site/users/${userId}?error=${encodeURIComponent("Cet email est déjà utilisé.")}`,
     );
   }
 
@@ -79,25 +79,25 @@ export async function updateUser(userId: string, formData: FormData) {
     },
   });
 
-  revalidatePath("/admin/users");
-  revalidatePath(`/admin/users/${userId}`);
-  redirect("/admin/users");
+  revalidatePath("/site/users");
+  revalidatePath(`/site/users/${userId}`);
+  redirect("/site/users");
 }
 
 export async function deleteUser(formData: FormData) {
-  const session = await requireSuperAdmin();
+  const session = await requireSiteAdmin();
 
   const id = String(formData.get("id"));
 
   // Never let an admin delete their own account.
   if (id === session.user.id) {
     redirect(
-      `/admin/users?error=${encodeURIComponent("Vous ne pouvez pas supprimer votre propre compte.")}`,
+      `/site/users?error=${encodeURIComponent("Vous ne pouvez pas supprimer votre propre compte.")}`,
     );
   }
 
   await prisma.user.delete({ where: { id } });
 
-  revalidatePath("/admin/users");
-  redirect("/admin/users");
+  revalidatePath("/site/users");
+  redirect("/site/users");
 }

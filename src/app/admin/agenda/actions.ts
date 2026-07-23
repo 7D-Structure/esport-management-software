@@ -21,30 +21,37 @@ function readEventForm(formData: FormData) {
 }
 
 export async function createEvent(formData: FormData) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
 
   const data = readEventForm(formData);
-  const event = await prisma.event.create({ data });
+  const event = await prisma.event.create({
+    data: { ...data, organizationId: organization.id },
+  });
 
   revalidatePath("/admin/agenda");
   redirect(`/admin/agenda/${event.id}`);
 }
 
 export async function updateEvent(eventId: string, formData: FormData) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
 
   const data = readEventForm(formData);
-  await prisma.event.update({ where: { id: eventId }, data });
+  await prisma.event.updateMany({
+    where: { id: eventId, organizationId: organization.id },
+    data,
+  });
 
   revalidatePath("/admin/agenda");
   revalidatePath(`/admin/agenda/${eventId}`);
 }
 
 export async function deleteEvent(formData: FormData) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
 
   const id = String(formData.get("id"));
-  await prisma.event.delete({ where: { id } });
+  await prisma.event.deleteMany({
+    where: { id, organizationId: organization.id },
+  });
 
   revalidatePath("/admin/agenda");
   redirect("/admin/agenda");

@@ -22,6 +22,57 @@ export const STAFF_ROLE_LABELS: Record<string, string> = {
   OTHER: "Autre",
 };
 
+export const ORG_ROLE_LABELS: Record<string, string> = {
+  OWNER: "Propriétaire",
+  ADMIN: "Administrateur",
+  MANAGER: "Manager",
+  COACH: "Coach",
+  STAFF: "Staff",
+};
+
+export const USER_ROLE_LABELS: Record<string, string> = {
+  ADMIN: "Administrateur",
+  STAFF: "Staff",
+  MANAGER: "Manager",
+  COACH: "Coach",
+  PLAYER: "Joueur",
+};
+
+export const GOAL_STATUS_LABELS: Record<string, string> = {
+  TODO: "À faire",
+  IN_PROGRESS: "En cours",
+  DONE: "Atteint",
+};
+
+export const GOAL_STATUS_COLORS: Record<string, string> = {
+  TODO: "bg-neutral-400",
+  IN_PROGRESS: "bg-amber-500",
+  DONE: "bg-emerald-500",
+};
+
+export const INVITATION_STATUS_LABELS: Record<string, string> = {
+  PENDING: "En attente",
+  ACCEPTED: "Acceptée",
+  DECLINED: "Refusée",
+};
+
+export const INVITATION_STATUS_COLORS: Record<string, string> = {
+  PENDING: "bg-amber-500",
+  ACCEPTED: "bg-emerald-500",
+  DECLINED: "bg-red-500",
+};
+
+export const DOCUMENT_CATEGORY_LABELS: Record<string, string> = {
+  STATUTES: "Statuts",
+  MINUTES: "Procès-verbal",
+  RULES: "Règlement intérieur",
+  REPORT: "Rapport",
+  LICENSE: "Licence",
+  INSURANCE: "Assurance",
+  FINANCIAL: "Document financier",
+  OTHER: "Autre",
+};
+
 export const CONTACT_TYPE_LABELS: Record<string, string> = {
   EMAIL: "Email",
   PHONE: "Téléphone",
@@ -71,55 +122,11 @@ export const SERVER_STATUS_LABELS: Record<string, string> = {
   UNKNOWN: "Inconnu",
 };
 
-// Tailwind classes for the status dot of each server status.
 export const SERVER_STATUS_COLORS: Record<string, string> = {
   ONLINE: "bg-emerald-500",
   OFFLINE: "bg-red-500",
   MAINTENANCE: "bg-amber-500",
   UNKNOWN: "bg-neutral-400",
-};
-
-export const USER_ROLE_LABELS: Record<string, string> = {
-  ADMIN: "Administrateur",
-  STAFF: "Staff",
-  MANAGER: "Manager",
-  COACH: "Coach",
-  PLAYER: "Joueur",
-};
-
-export const GOAL_STATUS_LABELS: Record<string, string> = {
-  TODO: "À faire",
-  IN_PROGRESS: "En cours",
-  DONE: "Atteint",
-};
-
-export const INVITATION_STATUS_LABELS: Record<string, string> = {
-  PENDING: "En attente",
-  ACCEPTED: "Acceptée",
-  DECLINED: "Refusée",
-};
-
-export const INVITATION_STATUS_COLORS: Record<string, string> = {
-  PENDING: "bg-amber-500",
-  ACCEPTED: "bg-emerald-500",
-  DECLINED: "bg-red-500",
-};
-
-export const DOCUMENT_CATEGORY_LABELS: Record<string, string> = {
-  STATUTES: "Statuts",
-  MINUTES: "Procès-verbal",
-  RULES: "Règlement intérieur",
-  REPORT: "Rapport",
-  LICENSE: "Licence",
-  INSURANCE: "Assurance",
-  FINANCIAL: "Document financier",
-  OTHER: "Autre",
-};
-
-export const GOAL_STATUS_COLORS: Record<string, string> = {
-  TODO: "bg-neutral-400",
-  IN_PROGRESS: "bg-amber-500",
-  DONE: "bg-emerald-500",
 };
 
 export const FINANCE_TYPE_LABELS: Record<string, string> = {

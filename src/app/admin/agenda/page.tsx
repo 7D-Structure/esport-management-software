@@ -15,7 +15,7 @@ export default async function AgendaPage({
 }: {
   searchParams: Promise<{ month?: string }>;
 }) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
 
   const { month: monthParam } = await searchParams;
   const { year, month } = parseMonthParam(monthParam);
@@ -24,12 +24,16 @@ export default async function AgendaPage({
   const [monthEvents, upcomingEvents] = await Promise.all([
     prisma.event.findMany({
       where: {
+        organizationId: organization.id,
         startsAt: { gte: info.gridStart, lt: info.gridEnd },
       },
       orderBy: { startsAt: "asc" },
     }),
     prisma.event.findMany({
-      where: { startsAt: { gte: new Date() } },
+      where: {
+        organizationId: organization.id,
+        startsAt: { gte: new Date() },
+      },
       orderBy: { startsAt: "asc" },
       take: 8,
       include: { team: true },

@@ -23,30 +23,37 @@ function readFinanceForm(formData: FormData) {
 }
 
 export async function createFinanceEntry(formData: FormData) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
 
   const data = readFinanceForm(formData);
-  const entry = await prisma.financeEntry.create({ data });
+  const entry = await prisma.financeEntry.create({
+    data: { ...data, organizationId: organization.id },
+  });
 
   revalidatePath("/admin/costs");
   redirect(`/admin/costs/${entry.id}`);
 }
 
 export async function updateFinanceEntry(entryId: string, formData: FormData) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
 
   const data = readFinanceForm(formData);
-  await prisma.financeEntry.update({ where: { id: entryId }, data });
+  await prisma.financeEntry.updateMany({
+    where: { id: entryId, organizationId: organization.id },
+    data,
+  });
 
   revalidatePath("/admin/costs");
   revalidatePath(`/admin/costs/${entryId}`);
 }
 
 export async function deleteFinanceEntry(formData: FormData) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
 
   const id = String(formData.get("id"));
-  await prisma.financeEntry.delete({ where: { id } });
+  await prisma.financeEntry.deleteMany({
+    where: { id, organizationId: organization.id },
+  });
 
   revalidatePath("/admin/costs");
   redirect("/admin/costs");

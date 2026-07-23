@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { requireSuperAdmin } from "@/lib/require-admin";
+import { requireSiteAdmin } from "@/lib/require-admin";
 import { UserForm } from "../user-form";
 import { deleteUser, updateUser } from "../actions";
 
@@ -11,7 +11,7 @@ export default async function EditUserPage({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ error?: string }>;
 }) {
-  const session = await requireSuperAdmin();
+  const session = await requireSiteAdmin();
   const { id } = await params;
   const { error } = await searchParams;
 

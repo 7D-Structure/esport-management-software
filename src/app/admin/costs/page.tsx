@@ -9,15 +9,17 @@ import { formatCents, formatSignedCents } from "@/lib/money";
 import { toDateInputValue } from "@/lib/datetime";
 
 export default async function CostsPage() {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
 
   const [entries, totals] = await Promise.all([
     prisma.financeEntry.findMany({
+      where: { organizationId: organization.id },
       orderBy: { date: "desc" },
       include: { team: true },
     }),
     prisma.financeEntry.groupBy({
       by: ["type"],
+      where: { organizationId: organization.id },
       _sum: { amountCents: true },
     }),
   ]);
