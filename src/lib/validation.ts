@@ -54,6 +54,35 @@ export const SERVER_STATUS_VALUES = [
   "UNKNOWN",
 ] as const;
 
+export const USER_ROLE_VALUES = [
+  "ADMIN",
+  "STAFF",
+  "MANAGER",
+  "COACH",
+  "PLAYER",
+] as const;
+
+export const userCreateSchema = z.object({
+  name: z.string().min(1, "Le nom est requis"),
+  email: z.string().email("Email invalide"),
+  role: z.enum(USER_ROLE_VALUES),
+  password: z.string().min(8, "Mot de passe : 8 caractères minimum"),
+});
+
+export const userUpdateSchema = z.object({
+  name: z.string().min(1, "Le nom est requis"),
+  email: z.string().email("Email invalide"),
+  role: z.enum(USER_ROLE_VALUES),
+  // Optional on update: only rehashed when a new value is provided.
+  password: z
+    .string()
+    .optional()
+    .transform((value) => (value && value.length > 0 ? value : undefined))
+    .refine((value) => value === undefined || value.length >= 8, {
+      message: "Mot de passe : 8 caractères minimum",
+    }),
+});
+
 export const GOAL_STATUS_VALUES = ["TODO", "IN_PROGRESS", "DONE"] as const;
 
 export const DOCUMENT_CATEGORY_VALUES = [

@@ -1,0 +1,82 @@
+import Link from "next/link";
+import { prisma } from "@/lib/prisma";
+import { requireSuperAdmin } from "@/lib/require-admin";
+import { USER_ROLE_LABELS } from "@/lib/labels";
+
+export default async function UsersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const session = await requireSuperAdmin();
+  const { error } = await searchParams;
+
+  const users = await prisma.user.findMany({
+    orderBy: [{ role: "asc" }, { name: "asc" }],
+    include: {
+      player: { select: { id: true } },
+      staff: { select: { id: true } },
+    },
+  });
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold">Comptes</h1>
+          <p className="text-sm text-neutral-500">
+            Gérez les comptes utilisateurs et leurs rôles.
+          </p>
+        </div>
+        <Link
+          href="/admin/users/new"
+          className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white dark:bg-white dark:text-neutral-900"
+        >
+          + Nouveau compte
+        </Link>
+      </div>
+
+      {error && (
+        <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300">
+          {error}
+        </p>
+      )}
+
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b border-neutral-200 text-left text-neutral-500 dark:border-neutral-800">
+            <th className="py-2">Nom</th>
+            <th className="py-2">Email</th>
+            <th className="py-2">Rôle</th>
+            <th className="py-2">Profil lié</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map((user) => (
+            <tr
+              key={user.id}
+              className="border-b border-neutral-100 hover:bg-neutral-50 dark:border-neutral-900 dark:hover:bg-neutral-900"
+            >
+              <td className="py-2">
+                <Link
+                  href={`/admin/users/${user.id}`}
+                  className="font-medium hover:underline"
+                >
+                  {user.name}
+                </Link>
+                {user.id === session.user.id && (
+                  <span className="ml-2 text-xs text-neutral-500">(vous)</span>
+                )}
+              </td>
+              <td className="py-2">{user.email}</td>
+              <td className="py-2">{USER_ROLE_LABELS[user.role]}</td>
+              <td className="py-2 text-neutral-500">
+                {user.player ? "Joueur" : user.staff ? "Staff" : "—"}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}

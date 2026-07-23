@@ -12,3 +12,17 @@ export async function requireAdmin() {
 
   return session;
 }
+
+// Stricter guard for sensitive management (accounts & roles): ADMIN only.
+export async function requireSuperAdmin() {
+  const session = await auth();
+
+  if (!session?.user) {
+    redirect("/login");
+  }
+  if (session.user.role !== "ADMIN") {
+    redirect("/admin/players");
+  }
+
+  return session;
+}

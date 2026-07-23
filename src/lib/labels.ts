@@ -79,6 +79,14 @@ export const SERVER_STATUS_COLORS: Record<string, string> = {
   UNKNOWN: "bg-neutral-400",
 };
 
+export const USER_ROLE_LABELS: Record<string, string> = {
+  ADMIN: "Administrateur",
+  STAFF: "Staff",
+  MANAGER: "Manager",
+  COACH: "Coach",
+  PLAYER: "Joueur",
+};
+
 export const GOAL_STATUS_LABELS: Record<string, string> = {
   TODO: "À faire",
   IN_PROGRESS: "En cours",

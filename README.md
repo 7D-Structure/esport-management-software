@@ -78,6 +78,9 @@ Joueur/Coach (configurations, objectifs, notebook, agenda) pour votre structure 
     Source (CS2)
   - Documents associatifs : catalogue de documents (statuts, PV, règlement, licences...)
     référencés par lien externe (Drive, Nextcloud, PDF public), gérés par l'admin
+  - Gestion des comptes (réservée au rôle `ADMIN`) : création/édition/suppression des comptes
+    utilisateurs et de leur rôle de compte, avec garde-fous (email unique, pas d'auto-suppression
+    ni de changement de son propre rôle)
   - Stats CS2 (FaceIT) : sur la fiche d'un joueur CS2, affichage des statistiques FaceIT à
     partir de son pseudo (niveau, elo, matchs, winrate, K/D, HS%)
   - Synchronisation HelloAsso : import des adhésions HelloAsso comme joueurs (licences)

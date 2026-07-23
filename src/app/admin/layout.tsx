@@ -13,6 +13,9 @@ const NAV_LINKS = [
   { href: "/admin/helloasso", label: "HelloAsso" },
 ];
 
+// Account & role management is restricted to ADMIN.
+const ADMIN_ONLY_LINKS = [{ href: "/admin/users", label: "Comptes" }];
+
 export default async function AdminLayout({
   children,
 }: {
@@ -20,12 +23,17 @@ export default async function AdminLayout({
 }) {
   const session = await requireAdmin();
 
+  const navLinks =
+    session.user.role === "ADMIN"
+      ? [...NAV_LINKS, ...ADMIN_ONLY_LINKS]
+      : NAV_LINKS;
+
   return (
     <div className="mx-auto flex w-full min-h-screen max-w-6xl flex-col gap-6 p-6">
       <header className="flex items-center justify-between border-b border-neutral-200 pb-4 dark:border-neutral-800">
         <nav className="flex items-center gap-6">
           <span className="text-lg font-bold">Administration</span>
-          {NAV_LINKS.map((link) => (
+          {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
