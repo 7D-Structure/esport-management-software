@@ -122,6 +122,95 @@ model User {
   configFiles ConfigFile[]
   goals       Goal[]
   notes       Note[]
+
+  playerProfile       PlayerProfile?
+  rostersOwned        Roster[]           @relation("RosterOwner")
+  rosterMemberships   RosterMembership[] @relation("RosterMemberships")
+  invitationsSent     Invitation[]       @relation("InvitationsSent")
+  invitationsReceived Invitation[]       @relation("InvitationsReceived")
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+// Player-side "looking for team" profile shown in the Player Finder.
+model PlayerProfile {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  game           Game    @default(CS2)
+  inGameRole     String?
+  faceitNickname String?
+  availability   String?
+  bio            String?
+  lookingForTeam Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([game, lookingForTeam])
+}
+
+// A team created by a user for recruitment, shown in the Team Finder.
+model Roster {
+  id      String @id @default(cuid())
+  ownerId String
+  owner   User   @relation("RosterOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  name           String
+  game           Game    @default(CS2)
+  description    String?
+  roleNeeded     String?
+  minFaceitLevel Int?
+  recruiting     Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberships RosterMembership[]
+  invitations Invitation[]
+
+  @@index([ownerId])
+  @@index([game, recruiting])
+}
+
+model RosterMembership {
+  id       String @id @default(cuid())
+  rosterId String
+  roster   Roster @relation(fields: [rosterId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User   @relation("RosterMemberships", fields: [userId], references: [id], onDelete: Cascade)
+
+  role     String?
+  joinedAt DateTime @default(now())
+
+  @@unique([rosterId, userId])
+  @@index([userId])
+}
+
+model Invitation {
+  id       String @id @default(cuid())
+  rosterId String
+  roster   Roster @relation(fields: [rosterId], references: [id], onDelete: Cascade)
+
+  fromUserId String
+  fromUser   User   @relation("InvitationsSent", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUserId   String
+  toUser     User   @relation("InvitationsReceived", fields: [toUserId], references: [id], onDelete: Cascade)
+
+  status  InvitationStatus @default(PENDING)
+  message String?
+
+  createdAt   DateTime  @default(now())
+  respondedAt DateTime?
+
+  @@unique([rosterId, toUserId])
+  @@index([toUserId])
+  @@index([rosterId])
 }
 
 model ConfigFile {

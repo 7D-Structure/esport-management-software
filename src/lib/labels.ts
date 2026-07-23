@@ -85,6 +85,18 @@ export const GOAL_STATUS_LABELS: Record<string, string> = {
   DONE: "Atteint",
 };
 
+export const INVITATION_STATUS_LABELS: Record<string, string> = {
+  PENDING: "En attente",
+  ACCEPTED: "Acceptée",
+  DECLINED: "Refusée",
+};
+
+export const INVITATION_STATUS_COLORS: Record<string, string> = {
+  PENDING: "bg-amber-500",
+  ACCEPTED: "bg-emerald-500",
+  DECLINED: "bg-red-500",
+};
+
 export const DOCUMENT_CATEGORY_LABELS: Record<string, string> = {
   STATUTES: "Statuts",
   MINUTES: "Procès-verbal",

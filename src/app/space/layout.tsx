@@ -3,6 +3,7 @@ import { requireUser } from "@/lib/require-user";
 import { signOut } from "@/auth";
 
 const NAV_LINKS = [
+  { href: "/space/recruitment", label: "Recrutement" },
   { href: "/space/configs", label: "Configs" },
   { href: "/space/goals", label: "Objectifs" },
   { href: "/space/notebook", label: "Notebook" },

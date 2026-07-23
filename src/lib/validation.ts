@@ -118,6 +118,42 @@ export const documentSchema = z.object({
   url: z.string().url("Lien invalide (URL complète attendue)"),
 });
 
+// HTML checkboxes submit "on" when checked and nothing when unchecked.
+const checkbox = z.preprocess((value) => value === "on" || value === "true", z.boolean());
+
+const optionalFaceitLevel = z
+  .string()
+  .optional()
+  .transform((value) => (value && value.length > 0 ? Number(value) : undefined))
+  .refine(
+    (value) =>
+      value === undefined ||
+      (Number.isInteger(value) && value >= 1 && value <= 10),
+    { message: "Niveau FaceIT invalide (1-10)" },
+  );
+
+export const playerProfileSchema = z.object({
+  game: z.enum(GAME_VALUES).default("CS2"),
+  inGameRole: optionalString,
+  faceitNickname: optionalString,
+  availability: optionalString,
+  bio: optionalString,
+  lookingForTeam: checkbox,
+});
+
+export const rosterSchema = z.object({
+  name: z.string().min(1, "Le nom de l'équipe est requis"),
+  game: z.enum(GAME_VALUES).default("CS2"),
+  description: optionalString,
+  roleNeeded: optionalString,
+  minFaceitLevel: optionalFaceitLevel,
+  recruiting: checkbox,
+});
+
+export const invitationSchema = z.object({
+  message: optionalString,
+});
+
 export const playerSchema = z.object({
   firstName: z.string().min(1, "Le prénom est requis"),
   lastName: z.string().min(1, "Le nom est requis"),

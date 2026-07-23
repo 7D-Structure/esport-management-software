@@ -37,6 +37,22 @@ async function main() {
   });
 
   console.log(`Player user ready: ${player.email}`);
+
+  const player2Email = process.env.SEED_PLAYER2_EMAIL ?? "joueur2@example.com";
+  const player2Hash = await bcrypt.hash(playerPassword, 10);
+
+  const player2 = await prisma.user.upsert({
+    where: { email: player2Email },
+    update: {},
+    create: {
+      email: player2Email,
+      name: "Coach Démo",
+      role: "COACH",
+      passwordHash: player2Hash,
+    },
+  });
+
+  console.log(`Second user ready: ${player2.email}`);
 }
 
 main()

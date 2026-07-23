@@ -86,6 +86,9 @@ Joueur/Coach (configurations, objectifs, notebook, agenda) pour votre structure 
   - Mes objectifs : objectifs personnels avec statut (à faire / en cours / atteint) et échéance
   - Mon notebook : notes personnelles
   - Documents : consultation (lecture seule) des documents associatifs partagés par l'admin
+  - Recrutement CS2 (self-service) : profil « en recherche d'équipe », **Player Finder** et
+    **Team Finder**, création d'équipes (rosters), invitations de joueurs (envoi /
+    acceptation / refus) et gestion des membres
 
   Chaque ressource personnelle appartient à l'utilisateur connecté et n'est visible que par
   lui. Après connexion, `/enter` redirige les rôles `ADMIN`/`STAFF` vers l'espace admin et les
