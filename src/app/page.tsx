@@ -13,12 +13,20 @@ export default function Home() {
           (configurations, objectifs, notebook, agenda) pour votre structure
           esport.
         </p>
-        <Link
-          href="/enter"
-          className="flex h-12 items-center justify-center rounded-full bg-foreground px-6 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc]"
-        >
-          Accéder à mon espace
-        </Link>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <Link
+            href="/register"
+            className="flex h-12 items-center justify-center rounded-full bg-foreground px-6 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc]"
+          >
+            Créer un compte
+          </Link>
+          <Link
+            href="/enter"
+            className="flex h-12 items-center justify-center rounded-full border border-black/[.12] px-6 transition-colors hover:bg-black/[.04] dark:border-white/[.16] dark:hover:bg-white/[.06]"
+          >
+            Accéder à mon espace
+          </Link>
+        </div>
       </main>
     </div>
   );

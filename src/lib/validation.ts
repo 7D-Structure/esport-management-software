@@ -69,6 +69,13 @@ export const userCreateSchema = z.object({
   password: z.string().min(8, "Mot de passe : 8 caractères minimum"),
 });
 
+// Public self-registration (always creates a PLAYER account).
+export const registerSchema = z.object({
+  name: z.string().min(1, "Le nom est requis"),
+  email: z.string().email("Email invalide"),
+  password: z.string().min(8, "Mot de passe : 8 caractères minimum"),
+});
+
 export const userUpdateSchema = z.object({
   name: z.string().min(1, "Le nom est requis"),
   email: z.string().email("Email invalide"),

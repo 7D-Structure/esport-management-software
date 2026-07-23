@@ -85,6 +85,9 @@ Joueur/Coach (configurations, objectifs, notebook, agenda) pour votre structure 
     partir de son pseudo (niveau, elo, matchs, winrate, K/D, HS%)
   - Synchronisation HelloAsso : import des adhésions HelloAsso comme joueurs (licences)
 
+- **Inscription publique** (`/register`) : n'importe qui crée un compte joueur en libre-service,
+  est connecté automatiquement et arrive sur son profil LFT (recherche d'équipe).
+
 - **Espace Joueur/Coach** (`/space`, auth required — any authenticated user):
   - Mes configs : stockage de fichiers `.cfg` par jeu, avec téléchargement
   - Mes objectifs : objectifs personnels avec statut (à faire / en cours / atteint) et échéance

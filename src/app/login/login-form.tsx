@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 
@@ -78,6 +79,13 @@ export function LoginForm() {
       >
         {isPending ? "Connexion..." : "Se connecter"}
       </button>
+
+      <p className="text-center text-sm text-neutral-500">
+        Pas encore de compte ?{" "}
+        <Link href="/register" className="font-medium underline">
+          Créer un compte
+        </Link>
+      </p>
     </form>
   );
 }
