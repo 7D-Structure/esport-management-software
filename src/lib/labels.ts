@@ -64,6 +64,21 @@ export const EVENT_TYPE_COLORS: Record<string, string> = {
   OTHER: "bg-neutral-500",
 };
 
+export const SERVER_STATUS_LABELS: Record<string, string> = {
+  ONLINE: "En ligne",
+  OFFLINE: "Hors ligne",
+  MAINTENANCE: "Maintenance",
+  UNKNOWN: "Inconnu",
+};
+
+// Tailwind classes for the status dot of each server status.
+export const SERVER_STATUS_COLORS: Record<string, string> = {
+  ONLINE: "bg-emerald-500",
+  OFFLINE: "bg-red-500",
+  MAINTENANCE: "bg-amber-500",
+  UNKNOWN: "bg-neutral-400",
+};
+
 export const FINANCE_TYPE_LABELS: Record<string, string> = {
   EXPENSE: "Dépense",
   INCOME: "Recette",

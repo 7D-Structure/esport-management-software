@@ -47,6 +47,13 @@ export const EVENT_STATUS_VALUES = [
   "COMPLETED",
 ] as const;
 
+export const SERVER_STATUS_VALUES = [
+  "ONLINE",
+  "OFFLINE",
+  "MAINTENANCE",
+  "UNKNOWN",
+] as const;
+
 export const FINANCE_TYPE_VALUES = ["EXPENSE", "INCOME"] as const;
 
 export const FINANCE_CATEGORY_VALUES = [
@@ -127,6 +134,31 @@ export const eventSchema = z
     message: "La fin doit être après le début",
     path: ["endsAt"],
   });
+
+const optionalPort = z
+  .string()
+  .optional()
+  .transform((value) => (value && value.length > 0 ? Number(value) : undefined))
+  .refine(
+    (value) =>
+      value === undefined ||
+      (Number.isInteger(value) && value >= 1 && value <= 65535),
+    { message: "Port invalide (1-65535)" },
+  );
+
+export const gameServerSchema = z.object({
+  name: z.string().min(1, "Le nom est requis"),
+  game: z.enum(GAME_VALUES),
+  status: z.enum(SERVER_STATUS_VALUES).default("UNKNOWN"),
+  host: z.string().min(1, "L'hôte est requis"),
+  port: optionalPort,
+  serverPassword: optionalString,
+  rconPassword: optionalString,
+  provider: optionalString,
+  location: optionalString,
+  notes: optionalString,
+  teamId: optionalString,
+});
 
 export const financeEntrySchema = z.object({
   label: z.string().min(1, "Le libellé est requis"),

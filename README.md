@@ -70,6 +70,9 @@ Joueur/Coach (configurations, objectifs, notebook, agenda) pour votre structure 
     statut et notes
   - Gestion des coûts : dépenses et recettes catégorisées, rattachées à une équipe ou à
     l'association, avec récapitulatif recettes/dépenses/solde (montants stockés en centimes)
+  - Gestion des serveurs : inventaire des serveurs de jeu (hôte/port, statut, mots de passe
+    serveur/RCON, hébergeur, localisation), avec commande de connexion console pour les jeux
+    Source (CS2)
 
-Other modules described in the product roadmap (stats CS2 via Leetify/FaceIT, sync HelloAsso, gestion des
-serveurs, documents associatifs, espace joueur/coach) are not yet implemented.
+Other modules described in the product roadmap (stats CS2 via Leetify/FaceIT, sync HelloAsso,
+documents associatifs, espace joueur/coach) are not yet implemented.

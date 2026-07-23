@@ -64,6 +64,13 @@ enum EventStatus {
   COMPLETED
 }
 
+enum ServerStatus {
+  ONLINE
+  OFFLINE
+  MAINTENANCE
+  UNKNOWN
+}
+
 enum FinanceType {
   EXPENSE
   INCOME
@@ -103,10 +110,11 @@ model Team {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  players       Player[]
-  staff         Staff[]
-  events        Event[]
+  players        Player[]
+  staff          Staff[]
+  events         Event[]
   financeEntries FinanceEntry[]
+  gameServers    GameServer[]
 
   @@unique([name, game])
 }
@@ -155,6 +163,32 @@ model FinanceEntry {
 
   @@index([teamId])
   @@index([date])
+}
+
+model GameServer {
+  id     String       @id @default(cuid())
+  name   String
+  game   Game
+  status ServerStatus @default(UNKNOWN)
+
+  host String
+  port Int?
+
+  // Sensitive; only ever exposed inside the auth-gated admin area.
+  serverPassword String?
+  rconPassword   String?
+
+  provider String?
+  location String?
+  notes    String?
+
+  teamId String?
+  team   Team?   @relation(fields: [teamId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([teamId])
 }
 
 model Player {
