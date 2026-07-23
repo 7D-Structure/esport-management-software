@@ -63,8 +63,9 @@ Joueur/Coach (configurations, objectifs, notebook, agenda) pour votre structure 
 
 ## Current features
 
-- **Espace Administration** (`/admin`, auth required — roles `ADMIN`, `STAFF`, `COACH`):
-  - Gestion des équipes (par jeu : CS2, Rainbow Six Siege, Overwatch 2, Valorant, ...)
+- **Espace Administration** (`/admin`, auth required — roles `ADMIN`, `STAFF`, `MANAGER`, `COACH`):
+  - Gestion des équipes (par jeu : CS2, Rainbow Six Siege, Overwatch 2, Valorant, ...), avec le
+    responsable de chaque équipe (le membre du staff ayant le rôle `MANAGER`)
   - Gestion des joueurs : licences, rôle en jeu, contacts, disponibilités
   - Gestion du staff : rôle, contacts, disponibilités
   - Agenda & scrims : calendrier mensuel et liste des événements à venir (scrims,
@@ -91,8 +92,12 @@ Joueur/Coach (configurations, objectifs, notebook, agenda) pour votre structure 
     acceptation / refus) et gestion des membres
 
   Chaque ressource personnelle appartient à l'utilisateur connecté et n'est visible que par
-  lui. Après connexion, `/enter` redirige les rôles `ADMIN`/`STAFF` vers l'espace admin et les
-  autres vers `/space`.
+  lui. Après connexion, `/enter` redirige les rôles `ADMIN`/`STAFF`/`MANAGER` vers l'espace
+  admin et les autres (`COACH`, `PLAYER`) vers `/space`.
+
+Rôles de compte (hiérarchie) : `ADMIN` > `STAFF` > `MANAGER` > `COACH` > `PLAYER`. Le `MANAGER`
+est un rôle de gestion (accès admin) ; le responsable d'une équipe est le membre du staff dont
+le rôle est `MANAGER`.
 
 ## Optional integrations
 

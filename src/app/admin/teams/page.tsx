@@ -9,7 +9,16 @@ export default async function TeamsPage() {
 
   const teams = await prisma.team.findMany({
     orderBy: { name: "asc" },
-    include: { _count: { select: { players: true, staff: true } } },
+    include: {
+      _count: { select: { players: true, staff: true } },
+      // The team's default responsible is its staff member with the MANAGER role.
+      staff: {
+        where: { role: "MANAGER" },
+        orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
+        take: 1,
+        select: { firstName: true, lastName: true },
+      },
+    },
   });
 
   return (
@@ -66,19 +75,29 @@ export default async function TeamsPage() {
           <tr className="border-b border-neutral-200 text-left text-neutral-500 dark:border-neutral-800">
             <th className="py-2">Nom</th>
             <th className="py-2">Jeu</th>
+            <th className="py-2">Responsable</th>
             <th className="py-2">Joueurs</th>
             <th className="py-2">Staff</th>
             <th className="py-2" />
           </tr>
         </thead>
         <tbody>
-          {teams.map((team) => (
+          {teams.map((team) => {
+            const manager = team.staff[0];
+            return (
             <tr
               key={team.id}
               className="border-b border-neutral-100 dark:border-neutral-900"
             >
               <td className="py-2 font-medium">{team.name}</td>
               <td className="py-2">{GAME_LABELS[team.game]}</td>
+              <td className="py-2">
+                {manager ? (
+                  `${manager.firstName} ${manager.lastName}`
+                ) : (
+                  <span className="text-neutral-400">Aucun</span>
+                )}
+              </td>
               <td className="py-2">{team._count.players}</td>
               <td className="py-2">{team._count.staff}</td>
               <td className="py-2 text-right">
@@ -93,10 +112,11 @@ export default async function TeamsPage() {
                 </form>
               </td>
             </tr>
-          ))}
+            );
+          })}
           {teams.length === 0 && (
             <tr>
-              <td colSpan={5} className="py-6 text-center text-neutral-500">
+              <td colSpan={6} className="py-6 text-center text-neutral-500">
                 Aucune équipe pour le moment.
               </td>
             </tr>

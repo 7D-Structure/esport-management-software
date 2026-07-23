@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 
-const ADMIN_ROLES = new Set(["ADMIN", "STAFF", "COACH"]);
+const ADMIN_ROLES = new Set(["ADMIN", "STAFF", "MANAGER", "COACH"]);
 
 export async function requireAdmin() {
   const session = await auth();

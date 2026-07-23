@@ -9,8 +9,9 @@ export default async function EnterPage() {
     redirect("/login");
   }
 
+  // Management roles land in the admin area; coaches and players in their space.
   const role = session.user.role;
-  if (role === "ADMIN" || role === "STAFF") {
+  if (role === "ADMIN" || role === "STAFF" || role === "MANAGER") {
     redirect("/admin/players");
   }
 

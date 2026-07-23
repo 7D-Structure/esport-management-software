@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 
-const ADMIN_ROLES = new Set(["ADMIN", "STAFF", "COACH"]);
+const ADMIN_ROLES = new Set(["ADMIN", "STAFF", "MANAGER", "COACH"]);
 
 export const proxy = auth((req) => {
   const { pathname } = req.nextUrl;
