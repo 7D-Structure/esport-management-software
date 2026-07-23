@@ -1,4 +1,5 @@
 import { getFaceitStats, isFaceitConfigured } from "@/lib/faceit";
+import Link from "next/link";
 
 function StatTile({ label, value }: { label: string; value?: string }) {
   return (
@@ -12,10 +13,12 @@ function StatTile({ label, value }: { label: string; value?: string }) {
 // Server component: fetches CS2 stats for the player's FaceIT nickname.
 export async function FaceitStats({
   nickname,
+  apiKey,
 }: {
   nickname: string | null;
+  apiKey: string | null;
 }) {
-  const configured = isFaceitConfigured();
+  const configured = isFaceitConfigured(apiKey);
 
   return (
     <section className="max-w-2xl space-y-3">
@@ -23,8 +26,11 @@ export async function FaceitStats({
 
       {!configured && (
         <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-300">
-          Intégration FaceIT non configurée. Définissez{" "}
-          <code>FACEIT_API_KEY</code> pour activer les statistiques.
+          Intégration FaceIT non configurée.{" "}
+          <Link href="/admin/integrations" className="font-medium underline">
+            Configurez la clé API FaceIT
+          </Link>{" "}
+          de votre organisation.
         </p>
       )}
 
@@ -35,14 +41,20 @@ export async function FaceitStats({
       )}
 
       {configured && nickname && (
-        <FaceitStatsData nickname={nickname} />
+        <FaceitStatsData nickname={nickname} apiKey={apiKey as string} />
       )}
     </section>
   );
 }
 
-async function FaceitStatsData({ nickname }: { nickname: string }) {
-  const result = await getFaceitStats(nickname);
+async function FaceitStatsData({
+  nickname,
+  apiKey,
+}: {
+  nickname: string;
+  apiKey: string;
+}) {
+  const result = await getFaceitStats(nickname, apiKey);
 
   if (!result.ok) {
     return (

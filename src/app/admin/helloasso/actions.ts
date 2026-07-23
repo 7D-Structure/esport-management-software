@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/require-admin";
-import { getHelloAssoMembers } from "@/lib/helloasso";
+import { getHelloAssoMembers, resolveHelloAssoConfig } from "@/lib/helloasso";
 
 // Map a HelloAsso membership state to a local license status.
 function licenseStatusFor(state?: string): "ACTIVE" | "PENDING" {
@@ -14,7 +14,9 @@ function licenseStatusFor(state?: string): "ACTIVE" | "PENDING" {
 export async function syncHelloAssoMembers() {
   const { organization } = await requireAdmin();
 
-  const result = await getHelloAssoMembers();
+  const result = await getHelloAssoMembers(
+    resolveHelloAssoConfig(organization),
+  );
 
   if (!result.ok) {
     const params = new URLSearchParams({ error: result.message });

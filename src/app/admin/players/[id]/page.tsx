@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/require-admin";
 import { CONTACT_TYPE_LABELS, DAY_LABELS } from "@/lib/labels";
 import { CONTACT_TYPE_VALUES } from "@/lib/validation";
+import { resolveFaceitKey } from "@/lib/faceit";
 import { PlayerForm } from "../player-form";
 import { FaceitStats } from "../faceit-stats";
 import {
@@ -65,7 +66,10 @@ export default async function EditPlayerPage({
       />
 
       {player.game === "CS2" && (
-        <FaceitStats nickname={player.faceitNickname} />
+        <FaceitStats
+          nickname={player.faceitNickname}
+          apiKey={resolveFaceitKey(organization.faceitApiKey)}
+        />
       )}
 
       <section className="max-w-2xl space-y-4">

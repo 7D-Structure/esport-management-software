@@ -152,6 +152,12 @@ model Organization {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Per-organization integration credentials (override the global env vars).
+  faceitApiKey          String?
+  helloAssoClientId     String?
+  helloAssoClientSecret String?
+  helloAssoOrgSlug      String?
+
   memberships OrganizationMembership[]
 
   teams          Team[]

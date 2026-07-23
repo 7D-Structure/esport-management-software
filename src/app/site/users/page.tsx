@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSiteAdmin } from "@/lib/require-admin";
 import { USER_ROLE_LABELS } from "@/lib/labels";
+import { toggleSiteAdmin } from "../actions";
 
 export default async function UsersPage({
   searchParams,
@@ -49,32 +50,57 @@ export default async function UsersPage({
             <th className="py-2">Email</th>
             <th className="py-2">Rôle</th>
             <th className="py-2">Profil lié</th>
+            <th className="py-2">Admin site</th>
           </tr>
         </thead>
         <tbody>
-          {users.map((user) => (
-            <tr
-              key={user.id}
-              className="border-b border-neutral-100 hover:bg-neutral-50 dark:border-neutral-900 dark:hover:bg-neutral-900"
-            >
-              <td className="py-2">
-                <Link
-                  href={`/site/users/${user.id}`}
-                  className="font-medium hover:underline"
-                >
-                  {user.name}
-                </Link>
-                {user.id === session.user.id && (
-                  <span className="ml-2 text-xs text-neutral-500">(vous)</span>
-                )}
-              </td>
-              <td className="py-2">{user.email}</td>
-              <td className="py-2">{USER_ROLE_LABELS[user.role]}</td>
-              <td className="py-2 text-neutral-500">
-                {user.player ? "Joueur" : user.staff ? "Staff" : "—"}
-              </td>
-            </tr>
-          ))}
+          {users.map((user) => {
+            const isSelf = user.id === session.user.id;
+            return (
+              <tr
+                key={user.id}
+                className="border-b border-neutral-100 hover:bg-neutral-50 dark:border-neutral-900 dark:hover:bg-neutral-900"
+              >
+                <td className="py-2">
+                  <Link
+                    href={`/site/users/${user.id}`}
+                    className="font-medium hover:underline"
+                  >
+                    {user.name}
+                  </Link>
+                  {isSelf && (
+                    <span className="ml-2 text-xs text-neutral-500">(vous)</span>
+                  )}
+                </td>
+                <td className="py-2">{user.email}</td>
+                <td className="py-2">{USER_ROLE_LABELS[user.role]}</td>
+                <td className="py-2 text-neutral-500">
+                  {user.player ? "Joueur" : user.staff ? "Staff" : "—"}
+                </td>
+                <td className="py-2">
+                  <form action={toggleSiteAdmin}>
+                    <input type="hidden" name="userId" value={user.id} />
+                    <input
+                      type="hidden"
+                      name="makeAdmin"
+                      value={(!user.isSiteAdmin).toString()}
+                    />
+                    <button
+                      type="submit"
+                      disabled={isSelf && user.isSiteAdmin}
+                      className={`text-xs hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-60 ${
+                        user.isSiteAdmin
+                          ? "text-emerald-600"
+                          : "text-neutral-500"
+                      }`}
+                    >
+                      {user.isSiteAdmin ? "Oui — révoquer" : "Non — promouvoir"}
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

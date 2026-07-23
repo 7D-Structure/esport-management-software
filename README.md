@@ -76,7 +76,11 @@ sont visibles que dans son organisation).
 - **Organisation active** : un utilisateur peut appartenir à plusieurs organisations et bascule
   entre elles via le sélecteur dans l'en-tête de l'admin.
 - **Super-admin du site** (`/site`, `isSiteAdmin`) : vue et gestion de **toutes** les
-  organisations et de **tous** les comptes du site.
+  organisations (création avec propriétaire, suppression) et de **tous** les comptes du site
+  (dont l'octroi/retrait du statut super-admin).
+- **Intégrations par organisation** (`/admin/integrations`, propriétaire/admin) : chaque
+  organisation renseigne ses propres identifiants FaceIT / HelloAsso (stockés en base), qui
+  priment sur les variables d'environnement globales.
 - Le **marché du recrutement** (LFT / Player & Team Finder) reste **global** (inter-organisations).
 
 - **Espace Administration d'une organisation** (`/admin`, réservé aux membres de l'organisation active) :
@@ -126,14 +130,16 @@ le rôle est `MANAGER`.
 
 ## Optional integrations
 
-Both integrations are optional and read their credentials from environment variables. When the
-credentials are absent, the corresponding UI degrades gracefully (a "not configured" notice)
-and no external call is made.
+Both integrations are optional. Credentials are resolved **per organization** first (set in
+`/admin/integrations`), falling back to the global environment variables below. When neither is
+present the corresponding UI degrades gracefully (a "not configured" notice) and no external
+call is made.
 
-- **FaceIT** (CS2 stats): set `FACEIT_API_KEY`. Stats appear on a CS2 player's detail page
-  once the player has a FaceIT nickname.
-- **HelloAsso** (membership sync): set `HELLOASSO_CLIENT_ID`, `HELLOASSO_CLIENT_SECRET` and
+- **FaceIT** (CS2 stats): org `faceitApiKey` or global `FACEIT_API_KEY`. Stats appear on a CS2
+  player's detail page once the player has a FaceIT nickname.
+- **HelloAsso** (membership sync): org `helloAssoClientId` / `helloAssoClientSecret` /
+  `helloAssoOrgSlug`, or the global `HELLOASSO_CLIENT_ID`, `HELLOASSO_CLIENT_SECRET` and
   `HELLOASSO_ORGANIZATION_SLUG` (and optionally `HELLOASSO_API_BASE` for the sandbox). The sync
   runs from `/admin/helloasso`.
 
-See `.env.example` for all variables.
+See `.env.example` for the global fallback variables.

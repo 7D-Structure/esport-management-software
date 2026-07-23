@@ -1,5 +1,9 @@
+import Link from "next/link";
 import { requireAdmin } from "@/lib/require-admin";
-import { isHelloAssoConfigured } from "@/lib/helloasso";
+import {
+  isHelloAssoConfigured,
+  resolveHelloAssoConfig,
+} from "@/lib/helloasso";
 import { syncHelloAssoMembers } from "./actions";
 
 export default async function HelloAssoPage({
@@ -11,10 +15,12 @@ export default async function HelloAssoPage({
     error?: string;
   }>;
 }) {
-  await requireAdmin();
+  const { organization } = await requireAdmin();
 
   const { created, updated, error } = await searchParams;
-  const configured = isHelloAssoConfigured();
+  const configured = isHelloAssoConfigured(
+    resolveHelloAssoConfig(organization),
+  );
 
   return (
     <div className="max-w-2xl space-y-6">
@@ -42,14 +48,12 @@ export default async function HelloAssoPage({
         <div className="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-300">
           <p className="font-medium">Intégration non configurée</p>
           <p className="mt-1">
-            Définissez les variables d&apos;environnement suivantes pour activer
-            la synchronisation :
+            Renseignez les identifiants HelloAsso de votre organisation dans les{" "}
+            <Link href="/admin/integrations" className="font-medium underline">
+              paramètres d&apos;intégrations
+            </Link>
+            .
           </p>
-          <ul className="mt-2 list-inside list-disc font-mono text-xs">
-            <li>HELLOASSO_CLIENT_ID</li>
-            <li>HELLOASSO_CLIENT_SECRET</li>
-            <li>HELLOASSO_ORGANIZATION_SLUG</li>
-          </ul>
         </div>
       ) : (
         <div className="space-y-3">

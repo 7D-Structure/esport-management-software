@@ -7,8 +7,13 @@
 const FACEIT_BASE = "https://open.faceit.com/data/v4";
 const REQUEST_TIMEOUT_MS = 8000;
 
-export function isFaceitConfigured(): boolean {
-  return Boolean(process.env.FACEIT_API_KEY);
+// Resolve the API key for an organization, falling back to the global env var.
+export function resolveFaceitKey(orgKey?: string | null): string | null {
+  return orgKey || process.env.FACEIT_API_KEY || null;
+}
+
+export function isFaceitConfigured(apiKey?: string | null): boolean {
+  return Boolean(apiKey);
 }
 
 export type FaceitStats = {
@@ -34,12 +39,12 @@ export type FaceitResult =
   | { ok: true; stats: FaceitStats }
   | { ok: false; reason: "not_configured" | "not_found" | "error"; message: string };
 
-async function faceitFetch(path: string): Promise<Response> {
+async function faceitFetch(path: string, apiKey: string): Promise<Response> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
     return await fetch(`${FACEIT_BASE}${path}`, {
-      headers: { Authorization: `Bearer ${process.env.FACEIT_API_KEY}` },
+      headers: { Authorization: `Bearer ${apiKey}` },
       signal: controller.signal,
       // Stats change over time; cache briefly to avoid hammering the API.
       next: { revalidate: 300 },
@@ -50,18 +55,22 @@ async function faceitFetch(path: string): Promise<Response> {
 }
 
 // Fetch CS2 lifetime stats for a player by their FaceIT nickname.
-export async function getFaceitStats(nickname: string): Promise<FaceitResult> {
-  if (!isFaceitConfigured()) {
+export async function getFaceitStats(
+  nickname: string,
+  apiKey: string | null,
+): Promise<FaceitResult> {
+  if (!apiKey) {
     return {
       ok: false,
       reason: "not_configured",
-      message: "Intégration FaceIT non configurée (définir FACEIT_API_KEY).",
+      message: "Intégration FaceIT non configurée pour cette organisation.",
     };
   }
 
   try {
     const playerRes = await faceitFetch(
       `/players?nickname=${encodeURIComponent(nickname)}`,
+      apiKey,
     );
 
     if (playerRes.status === 404) {
@@ -94,7 +103,10 @@ export async function getFaceitStats(nickname: string): Promise<FaceitResult> {
 
     // Lifetime stats are a separate endpoint; failure here is non-fatal.
     try {
-      const statsRes = await faceitFetch(`/players/${player.player_id}/stats/cs2`);
+      const statsRes = await faceitFetch(
+        `/players/${player.player_id}/stats/cs2`,
+        apiKey,
+      );
       if (statsRes.ok) {
         const body = (await statsRes.json()) as FaceitStatsResponse;
         const l = body.lifetime ?? {};

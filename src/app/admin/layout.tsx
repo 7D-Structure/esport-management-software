@@ -24,7 +24,11 @@ export default async function AdminLayout({
     await requireAdmin();
 
   const navLinks = canManageOrg(membership.role)
-    ? [...NAV_LINKS, { href: "/admin/members", label: "Membres" }]
+    ? [
+        ...NAV_LINKS,
+        { href: "/admin/members", label: "Membres" },
+        { href: "/admin/integrations", label: "Intégrations" },
+      ]
     : NAV_LINKS;
 
   return (

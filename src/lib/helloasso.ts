@@ -6,16 +6,37 @@
 
 const REQUEST_TIMEOUT_MS = 10000;
 
+export type HelloAssoConfig = {
+  clientId: string;
+  clientSecret: string;
+  orgSlug: string;
+  apiBase: string;
+};
+
 function apiBase(): string {
   return process.env.HELLOASSO_API_BASE || "https://api.helloasso.com";
 }
 
-export function isHelloAssoConfigured(): boolean {
-  return Boolean(
-    process.env.HELLOASSO_CLIENT_ID &&
-      process.env.HELLOASSO_CLIENT_SECRET &&
-      process.env.HELLOASSO_ORGANIZATION_SLUG,
-  );
+// Resolve an org's HelloAsso config, falling back to the global env vars.
+export function resolveHelloAssoConfig(org: {
+  helloAssoClientId?: string | null;
+  helloAssoClientSecret?: string | null;
+  helloAssoOrgSlug?: string | null;
+}): HelloAssoConfig | null {
+  const clientId = org.helloAssoClientId || process.env.HELLOASSO_CLIENT_ID;
+  const clientSecret =
+    org.helloAssoClientSecret || process.env.HELLOASSO_CLIENT_SECRET;
+  const orgSlug =
+    org.helloAssoOrgSlug || process.env.HELLOASSO_ORGANIZATION_SLUG;
+
+  if (!clientId || !clientSecret || !orgSlug) {
+    return null;
+  }
+  return { clientId, clientSecret, orgSlug, apiBase: apiBase() };
+}
+
+export function isHelloAssoConfigured(config: HelloAssoConfig | null): boolean {
+  return config !== null;
 }
 
 export type HelloAssoMember = {
@@ -41,14 +62,14 @@ async function withTimeout(input: string, init: RequestInit): Promise<Response> 
   }
 }
 
-async function getAccessToken(): Promise<string> {
+async function getAccessToken(config: HelloAssoConfig): Promise<string> {
   const body = new URLSearchParams({
     grant_type: "client_credentials",
-    client_id: process.env.HELLOASSO_CLIENT_ID as string,
-    client_secret: process.env.HELLOASSO_CLIENT_SECRET as string,
+    client_id: config.clientId,
+    client_secret: config.clientSecret,
   });
 
-  const res = await withTimeout(`${apiBase()}/oauth2/token`, {
+  const res = await withTimeout(`${config.apiBase}/oauth2/token`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body,
@@ -67,21 +88,23 @@ async function getAccessToken(): Promise<string> {
 }
 
 // Fetch the organization's membership items and normalize them.
-export async function getHelloAssoMembers(): Promise<HelloAssoResult> {
-  if (!isHelloAssoConfigured()) {
+export async function getHelloAssoMembers(
+  config: HelloAssoConfig | null,
+): Promise<HelloAssoResult> {
+  if (!config) {
     return {
       ok: false,
       reason: "not_configured",
       message:
-        "Intégration HelloAsso non configurée (définir HELLOASSO_CLIENT_ID, HELLOASSO_CLIENT_SECRET et HELLOASSO_ORGANIZATION_SLUG).",
+        "Intégration HelloAsso non configurée pour cette organisation.",
     };
   }
 
   try {
-    const token = await getAccessToken();
-    const slug = process.env.HELLOASSO_ORGANIZATION_SLUG as string;
+    const token = await getAccessToken(config);
+    const slug = config.orgSlug;
 
-    const url = new URL(`${apiBase()}/v5/organizations/${slug}/items`);
+    const url = new URL(`${config.apiBase}/v5/organizations/${slug}/items`);
     url.searchParams.set("itemStates", "Processed");
     url.searchParams.set("pageSize", "100");
 
