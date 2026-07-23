@@ -39,3 +39,27 @@ export const DAY_LABELS = [
   "Vendredi",
   "Samedi",
 ];
+
+export const EVENT_TYPE_LABELS: Record<string, string> = {
+  SCRIM: "Scrim",
+  TRAINING: "Entraînement",
+  MATCH: "Match",
+  MEETING: "Réunion",
+  OTHER: "Autre",
+};
+
+export const EVENT_STATUS_LABELS: Record<string, string> = {
+  SCHEDULED: "Planifié",
+  CONFIRMED: "Confirmé",
+  CANCELLED: "Annulé",
+  COMPLETED: "Terminé",
+};
+
+// Tailwind classes for the colored dot/badge of each event type.
+export const EVENT_TYPE_COLORS: Record<string, string> = {
+  SCRIM: "bg-blue-500",
+  TRAINING: "bg-emerald-500",
+  MATCH: "bg-red-500",
+  MEETING: "bg-amber-500",
+  OTHER: "bg-neutral-500",
+};

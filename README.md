@@ -65,7 +65,9 @@ Joueur/Coach (configurations, objectifs, notebook, agenda) pour votre structure 
   - Gestion des équipes (par jeu : CS2, Rainbow Six Siege, Overwatch 2, Valorant, ...)
   - Gestion des joueurs : licences, rôle en jeu, contacts, disponibilités
   - Gestion du staff : rôle, contacts, disponibilités
+  - Agenda & scrims : calendrier mensuel et liste des événements à venir (scrims,
+    entraînements, matchs, réunions) rattachés à une équipe, avec adversaire, lieu/serveur,
+    statut et notes
 
 Other modules described in the product roadmap (stats CS2 via Leetify/FaceIT, sync HelloAsso, gestion des
-coûts, gestion des serveurs, agenda/scrims, documents associatifs, espace joueur/coach) are not yet
-implemented.
+coûts, gestion des serveurs, documents associatifs, espace joueur/coach) are not yet implemented.

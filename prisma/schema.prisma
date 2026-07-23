@@ -49,6 +49,21 @@ enum ContactType {
   OTHER
 }
 
+enum EventType {
+  SCRIM
+  TRAINING
+  MATCH
+  MEETING
+  OTHER
+}
+
+enum EventStatus {
+  SCHEDULED
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -71,8 +86,33 @@ model Team {
 
   players Player[]
   staff   Staff[]
+  events  Event[]
 
   @@unique([name, game])
+}
+
+model Event {
+  id    String    @id @default(cuid())
+  title String
+  type  EventType @default(SCRIM)
+
+  startsAt DateTime
+  endsAt   DateTime?
+
+  opponent String?
+  location String?
+  notes    String?
+
+  status EventStatus @default(SCHEDULED)
+
+  teamId String?
+  team   Team?   @relation(fields: [teamId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([teamId])
+  @@index([startsAt])
 }
 
 model Player {

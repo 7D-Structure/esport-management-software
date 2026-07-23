@@ -32,6 +32,21 @@ export const CONTACT_TYPE_VALUES = [
   "OTHER",
 ] as const;
 
+export const EVENT_TYPE_VALUES = [
+  "SCRIM",
+  "TRAINING",
+  "MATCH",
+  "MEETING",
+  "OTHER",
+] as const;
+
+export const EVENT_STATUS_VALUES = [
+  "SCHEDULED",
+  "CONFIRMED",
+  "CANCELLED",
+  "COMPLETED",
+] as const;
+
 const optionalDate = z
   .string()
   .optional()
@@ -79,3 +94,20 @@ export const availabilitySchema = z.object({
   endTime: z.string().regex(/^\d{2}:\d{2}$/, "Format attendu HH:mm"),
   note: optionalString,
 });
+
+export const eventSchema = z
+  .object({
+    title: z.string().min(1, "Le titre est requis"),
+    type: z.enum(EVENT_TYPE_VALUES).default("SCRIM"),
+    startsAt: z.coerce.date({ message: "La date de début est requise" }),
+    endsAt: optionalDate,
+    opponent: optionalString,
+    location: optionalString,
+    notes: optionalString,
+    status: z.enum(EVENT_STATUS_VALUES).default("SCHEDULED"),
+    teamId: optionalString,
+  })
+  .refine((data) => !data.endsAt || data.endsAt >= data.startsAt, {
+    message: "La fin doit être après le début",
+    path: ["endsAt"],
+  });
