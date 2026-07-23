@@ -75,15 +75,18 @@ Joueur/Coach (configurations, objectifs, notebook, agenda) pour votre structure 
   - Gestion des serveurs : inventaire des serveurs de jeu (hôte/port, statut, mots de passe
     serveur/RCON, hébergeur, localisation), avec commande de connexion console pour les jeux
     Source (CS2)
+  - Documents associatifs : catalogue de documents (statuts, PV, règlement, licences...)
+    référencés par lien externe (Drive, Nextcloud, PDF public), gérés par l'admin
 
 - **Espace Joueur/Coach** (`/space`, auth required — any authenticated user):
   - Mes configs : stockage de fichiers `.cfg` par jeu, avec téléchargement
   - Mes objectifs : objectifs personnels avec statut (à faire / en cours / atteint) et échéance
   - Mon notebook : notes personnelles
+  - Documents : consultation (lecture seule) des documents associatifs partagés par l'admin
 
-  Chaque ressource appartient à l'utilisateur connecté et n'est visible que par lui. Après
-  connexion, `/enter` redirige les rôles `ADMIN`/`STAFF` vers l'espace admin et les autres
-  vers `/space`.
+  Chaque ressource personnelle appartient à l'utilisateur connecté et n'est visible que par
+  lui. Après connexion, `/enter` redirige les rôles `ADMIN`/`STAFF` vers l'espace admin et les
+  autres vers `/space`.
 
-Other modules described in the product roadmap (stats CS2 via Leetify/FaceIT, sync HelloAsso,
-documents associatifs) are not yet implemented.
+Other modules described in the product roadmap (stats CS2 via Leetify/FaceIT, sync HelloAsso)
+are not yet implemented — both require external API credentials.

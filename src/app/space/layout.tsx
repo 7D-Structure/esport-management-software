@@ -6,6 +6,7 @@ const NAV_LINKS = [
   { href: "/space/configs", label: "Configs" },
   { href: "/space/goals", label: "Objectifs" },
   { href: "/space/notebook", label: "Notebook" },
+  { href: "/space/documents", label: "Documents" },
 ];
 
 export default async function SpaceLayout({

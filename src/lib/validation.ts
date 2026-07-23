@@ -56,6 +56,17 @@ export const SERVER_STATUS_VALUES = [
 
 export const GOAL_STATUS_VALUES = ["TODO", "IN_PROGRESS", "DONE"] as const;
 
+export const DOCUMENT_CATEGORY_VALUES = [
+  "STATUTES",
+  "MINUTES",
+  "RULES",
+  "REPORT",
+  "LICENSE",
+  "INSURANCE",
+  "FINANCIAL",
+  "OTHER",
+] as const;
+
 export const FINANCE_TYPE_VALUES = ["EXPENSE", "INCOME"] as const;
 
 export const FINANCE_CATEGORY_VALUES = [
@@ -98,6 +109,13 @@ export const goalSchema = z.object({
 export const noteSchema = z.object({
   title: z.string().min(1, "Le titre est requis"),
   content: z.string().default(""),
+});
+
+export const documentSchema = z.object({
+  title: z.string().min(1, "Le titre est requis"),
+  category: z.enum(DOCUMENT_CATEGORY_VALUES).default("OTHER"),
+  description: optionalString,
+  url: z.string().url("Lien invalide (URL complète attendue)"),
 });
 
 export const playerSchema = z.object({

@@ -77,6 +77,17 @@ enum GoalStatus {
   DONE
 }
 
+enum DocumentCategory {
+  STATUTES
+  MINUTES
+  RULES
+  REPORT
+  LICENSE
+  INSURANCE
+  FINANCIAL
+  OTHER
+}
+
 enum FinanceType {
   EXPENSE
   INCOME
@@ -156,6 +167,19 @@ model Note {
   updatedAt DateTime @updatedAt
 
   @@index([userId])
+}
+
+model Document {
+  id          String           @id @default(cuid())
+  title       String
+  category    DocumentCategory @default(OTHER)
+  description String?
+  url         String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
 }
 
 model Team {

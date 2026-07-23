@@ -85,6 +85,17 @@ export const GOAL_STATUS_LABELS: Record<string, string> = {
   DONE: "Atteint",
 };
 
+export const DOCUMENT_CATEGORY_LABELS: Record<string, string> = {
+  STATUTES: "Statuts",
+  MINUTES: "Procès-verbal",
+  RULES: "Règlement intérieur",
+  REPORT: "Rapport",
+  LICENSE: "Licence",
+  INSURANCE: "Assurance",
+  FINANCIAL: "Document financier",
+  OTHER: "Autre",
+};
+
 export const GOAL_STATUS_COLORS: Record<string, string> = {
   TODO: "bg-neutral-400",
   IN_PROGRESS: "bg-amber-500",
