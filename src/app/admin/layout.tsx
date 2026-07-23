@@ -7,6 +7,7 @@ const NAV_LINKS = [
   { href: "/admin/staff", label: "Staff" },
   { href: "/admin/teams", label: "Équipes" },
   { href: "/admin/agenda", label: "Agenda" },
+  { href: "/admin/costs", label: "Coûts" },
 ];
 
 export default async function AdminLayout({

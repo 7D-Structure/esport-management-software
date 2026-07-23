@@ -47,6 +47,22 @@ export const EVENT_STATUS_VALUES = [
   "COMPLETED",
 ] as const;
 
+export const FINANCE_TYPE_VALUES = ["EXPENSE", "INCOME"] as const;
+
+export const FINANCE_CATEGORY_VALUES = [
+  "EQUIPMENT",
+  "TRAVEL",
+  "TOURNAMENT_FEES",
+  "SALARY",
+  "SUBSCRIPTION",
+  "FACILITY",
+  "SPONSORSHIP",
+  "MEMBERSHIP",
+  "DONATION",
+  "GRANT",
+  "OTHER",
+] as const;
+
 const optionalDate = z
   .string()
   .optional()
@@ -111,3 +127,15 @@ export const eventSchema = z
     message: "La fin doit être après le début",
     path: ["endsAt"],
   });
+
+export const financeEntrySchema = z.object({
+  label: z.string().min(1, "Le libellé est requis"),
+  type: z.enum(FINANCE_TYPE_VALUES),
+  category: z.enum(FINANCE_CATEGORY_VALUES).default("OTHER"),
+  amount: z.coerce
+    .number({ message: "Le montant est requis" })
+    .positive("Le montant doit être positif"),
+  date: z.coerce.date({ message: "La date est requise" }),
+  notes: optionalString,
+  teamId: optionalString,
+});

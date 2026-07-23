@@ -1,3 +1,10 @@
+// Format a Date as the value expected by <input type="date"> (YYYY-MM-DD, local time).
+export function toDateInputValue(date?: Date | null): string {
+  if (!date) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
 // Format a Date as the value expected by <input type="datetime-local"> (local time).
 export function toDateTimeLocalValue(date?: Date | null): string {
   if (!date) return "";

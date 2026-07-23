@@ -64,6 +64,25 @@ enum EventStatus {
   COMPLETED
 }
 
+enum FinanceType {
+  EXPENSE
+  INCOME
+}
+
+enum FinanceCategory {
+  EQUIPMENT
+  TRAVEL
+  TOURNAMENT_FEES
+  SALARY
+  SUBSCRIPTION
+  FACILITY
+  SPONSORSHIP
+  MEMBERSHIP
+  DONATION
+  GRANT
+  OTHER
+}
+
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -84,9 +103,10 @@ model Team {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  players Player[]
-  staff   Staff[]
-  events  Event[]
+  players       Player[]
+  staff         Staff[]
+  events        Event[]
+  financeEntries FinanceEntry[]
 
   @@unique([name, game])
 }
@@ -113,6 +133,28 @@ model Event {
 
   @@index([teamId])
   @@index([startsAt])
+}
+
+model FinanceEntry {
+  id       String          @id @default(cuid())
+  label    String
+  type     FinanceType
+  category FinanceCategory @default(OTHER)
+
+  // Stored in cents to avoid floating-point rounding issues.
+  amountCents Int
+
+  date  DateTime
+  notes String?
+
+  teamId String?
+  team   Team?   @relation(fields: [teamId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([teamId])
+  @@index([date])
 }
 
 model Player {

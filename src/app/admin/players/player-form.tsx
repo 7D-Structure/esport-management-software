@@ -3,6 +3,7 @@ import {
   LICENSE_STATUS_LABELS,
 } from "@/lib/labels";
 import { GAME_VALUES, LICENSE_STATUS_VALUES } from "@/lib/validation";
+import { toDateInputValue } from "@/lib/datetime";
 
 type Team = { id: string; name: string };
 
@@ -18,11 +19,6 @@ type PlayerDefaults = {
   licenseExpiresAt?: Date | null;
   teamId?: string | null;
 };
-
-function toDateInputValue(date?: Date | null) {
-  if (!date) return "";
-  return date.toISOString().slice(0, 10);
-}
 
 export function PlayerForm({
   action,

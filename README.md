@@ -68,6 +68,8 @@ Joueur/Coach (configurations, objectifs, notebook, agenda) pour votre structure 
   - Agenda & scrims : calendrier mensuel et liste des événements à venir (scrims,
     entraînements, matchs, réunions) rattachés à une équipe, avec adversaire, lieu/serveur,
     statut et notes
+  - Gestion des coûts : dépenses et recettes catégorisées, rattachées à une équipe ou à
+    l'association, avec récapitulatif recettes/dépenses/solde (montants stockés en centimes)
 
 Other modules described in the product roadmap (stats CS2 via Leetify/FaceIT, sync HelloAsso, gestion des
-coûts, gestion des serveurs, documents associatifs, espace joueur/coach) are not yet implemented.
+serveurs, documents associatifs, espace joueur/coach) are not yet implemented.

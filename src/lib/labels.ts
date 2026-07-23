@@ -63,3 +63,22 @@ export const EVENT_TYPE_COLORS: Record<string, string> = {
   MEETING: "bg-amber-500",
   OTHER: "bg-neutral-500",
 };
+
+export const FINANCE_TYPE_LABELS: Record<string, string> = {
+  EXPENSE: "Dépense",
+  INCOME: "Recette",
+};
+
+export const FINANCE_CATEGORY_LABELS: Record<string, string> = {
+  EQUIPMENT: "Matériel",
+  TRAVEL: "Déplacement",
+  TOURNAMENT_FEES: "Frais de tournoi",
+  SALARY: "Salaire / indemnité",
+  SUBSCRIPTION: "Abonnement",
+  FACILITY: "Local / serveur",
+  SPONSORSHIP: "Sponsoring",
+  MEMBERSHIP: "Cotisation / licence",
+  DONATION: "Don",
+  GRANT: "Subvention",
+  OTHER: "Autre",
+};
