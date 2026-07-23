@@ -119,6 +119,8 @@ changement de son propre rôle).
   - Recrutement CS2 (self-service) : profil « en recherche d'équipe », **Player Finder** et
     **Team Finder**, création d'équipes (rosters), invitations de joueurs (envoi /
     acceptation / refus) et gestion des membres
+  - Mon compte (RGPD) : **export** de toutes ses données au format JSON et **suppression**
+    de son compte et de ses données personnelles
 
   Chaque ressource personnelle appartient à l'utilisateur connecté et n'est visible que par
   lui. Après connexion, `/enter` redirige les rôles `ADMIN`/`STAFF`/`MANAGER` vers l'espace
@@ -143,3 +145,18 @@ call is made.
   runs from `/admin/helloasso`.
 
 See `.env.example` for the global fallback variables.
+
+## Data storage & GDPR
+
+- **Storage**: a PostgreSQL database accessed through the Prisma ORM. The schema lives in
+  `prisma/schema.prisma` and versioned SQL migrations in `prisma/migrations/`. The connection is
+  configured via `DATABASE_URL` (e.g. Vercel Postgres / Neon in production). Account passwords are
+  **bcrypt-hashed**; they are never stored in clear text.
+- **Right to data portability**: from `/space/account`, a user can download all data tied to
+  their account as a JSON file (`/space/account/export`).
+- **Right to erasure**: from `/space/account`, a user can delete their account after typing a
+  confirmation. Deletion cascades their personal data (LFT profile, configs, goals, notes,
+  rosters they own, memberships, invitations) and removes the link from any organization-owned
+  Player/Staff record. If the user solely owns organizations, those organizations are deleted
+  too; if an owned organization is shared with other members, deletion is blocked so other
+  people's data is not erased.

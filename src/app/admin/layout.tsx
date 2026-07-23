@@ -59,6 +59,9 @@ export default async function AdminLayout({
               Site
             </Link>
           )}
+          <Link href="/space/account" className="hover:underline">
+            Mon compte
+          </Link>
           <span>{session.user.name}</span>
           <form
             action={async () => {
