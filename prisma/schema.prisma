@@ -1,0 +1,535 @@
+// Prisma schema for the esport management platform
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  STAFF
+  MANAGER
+  COACH
+  PLAYER
+}
+
+// Role of a user within a single organization (tenant).
+enum OrgRole {
+  OWNER
+  ADMIN
+  MANAGER
+  COACH
+  STAFF
+}
+
+enum Game {
+  CS2
+  RAINBOW_SIX_SIEGE
+  OVERWATCH_2
+  VALORANT
+  OTHER
+}
+
+enum LicenseStatus {
+  ACTIVE
+  PENDING
+  EXPIRED
+  NONE
+}
+
+enum StaffRole {
+  MANAGER
+  HEAD_COACH
+  COACH
+  ANALYST
+  ADMIN
+  OTHER
+}
+
+enum ContactType {
+  EMAIL
+  PHONE
+  DISCORD
+  EMERGENCY
+  OTHER
+}
+
+enum EventType {
+  SCRIM
+  TRAINING
+  MATCH
+  MEETING
+  OTHER
+}
+
+enum EventStatus {
+  SCHEDULED
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+enum ServerStatus {
+  ONLINE
+  OFFLINE
+  MAINTENANCE
+  UNKNOWN
+}
+
+enum GoalStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+enum DocumentCategory {
+  STATUTES
+  MINUTES
+  RULES
+  REPORT
+  LICENSE
+  INSURANCE
+  FINANCIAL
+  OTHER
+}
+
+enum FinanceType {
+  EXPENSE
+  INCOME
+}
+
+enum FinanceCategory {
+  EQUIPMENT
+  TRAVEL
+  TOURNAMENT_FEES
+  SALARY
+  SUBSCRIPTION
+  FACILITY
+  SPONSORSHIP
+  MEMBERSHIP
+  DONATION
+  GRANT
+  OTHER
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         UserRole @default(PLAYER)
+  // Site-wide super-admin (owns/oversees the whole platform).
+  isSiteAdmin  Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  player Player?
+  staff  Staff?
+
+  configFiles ConfigFile[]
+  goals       Goal[]
+  notes       Note[]
+
+  orgMemberships OrganizationMembership[]
+
+  playerProfile       PlayerProfile?
+  rostersOwned        Roster[]           @relation("RosterOwner")
+  rosterMemberships   RosterMembership[] @relation("RosterMemberships")
+  invitationsSent     Invitation[]       @relation("InvitationsSent")
+  invitationsReceived Invitation[]       @relation("InvitationsReceived")
+}
+
+// A tenant: an association/club that manages its own players, teams, etc.
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Per-organization integration credentials (override the global env vars).
+  faceitApiKey          String?
+  helloAssoClientId     String?
+  helloAssoClientSecret String?
+  helloAssoOrgSlug      String?
+
+  memberships OrganizationMembership[]
+
+  teams          Team[]
+  players        Player[]
+  staff          Staff[]
+  events         Event[]
+  financeEntries FinanceEntry[]
+  gameServers    GameServer[]
+  documents      Document[]
+}
+
+model OrganizationMembership {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  role      OrgRole  @default(STAFF)
+  createdAt DateTime @default(now())
+
+  @@unique([organizationId, userId])
+  @@index([userId])
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+// Player-side "looking for team" profile shown in the Player Finder.
+model PlayerProfile {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  game           Game    @default(CS2)
+  inGameRole     String?
+  faceitNickname String?
+  availability   String?
+  bio            String?
+  lookingForTeam Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([game, lookingForTeam])
+}
+
+// A team created by a user for recruitment, shown in the Team Finder.
+model Roster {
+  id      String @id @default(cuid())
+  ownerId String
+  owner   User   @relation("RosterOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  name           String
+  game           Game    @default(CS2)
+  description    String?
+  roleNeeded     String?
+  minFaceitLevel Int?
+  recruiting     Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberships RosterMembership[]
+  invitations Invitation[]
+
+  @@index([ownerId])
+  @@index([game, recruiting])
+}
+
+model RosterMembership {
+  id       String @id @default(cuid())
+  rosterId String
+  roster   Roster @relation(fields: [rosterId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User   @relation("RosterMemberships", fields: [userId], references: [id], onDelete: Cascade)
+
+  role     String?
+  joinedAt DateTime @default(now())
+
+  @@unique([rosterId, userId])
+  @@index([userId])
+}
+
+model Invitation {
+  id       String @id @default(cuid())
+  rosterId String
+  roster   Roster @relation(fields: [rosterId], references: [id], onDelete: Cascade)
+
+  fromUserId String
+  fromUser   User   @relation("InvitationsSent", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUserId   String
+  toUser     User   @relation("InvitationsReceived", fields: [toUserId], references: [id], onDelete: Cascade)
+
+  status  InvitationStatus @default(PENDING)
+  message String?
+
+  createdAt   DateTime  @default(now())
+  respondedAt DateTime?
+
+  @@unique([rosterId, toUserId])
+  @@index([toUserId])
+  @@index([rosterId])
+}
+
+model ConfigFile {
+  id      String @id @default(cuid())
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name    String
+  game    Game
+  content String @default("")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Goal {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title       String
+  description String?
+  targetDate  DateTime?
+  status      GoalStatus @default(TODO)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Note {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title   String
+  content String @default("")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Document {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  title       String
+  category    DocumentCategory @default(OTHER)
+  description String?
+  url         String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([category])
+}
+
+model Team {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  name      String
+  game      Game
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  players        Player[]
+  staff          Staff[]
+  events         Event[]
+  financeEntries FinanceEntry[]
+  gameServers    GameServer[]
+
+  @@unique([organizationId, name, game])
+  @@index([organizationId])
+}
+
+model Event {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  title String
+  type  EventType @default(SCRIM)
+
+  startsAt DateTime
+  endsAt   DateTime?
+
+  opponent String?
+  location String?
+  notes    String?
+
+  status EventStatus @default(SCHEDULED)
+
+  teamId String?
+  team   Team?   @relation(fields: [teamId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([teamId])
+  @@index([startsAt])
+}
+
+model FinanceEntry {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  label    String
+  type     FinanceType
+  category FinanceCategory @default(OTHER)
+
+  // Stored in cents to avoid floating-point rounding issues.
+  amountCents Int
+
+  date  DateTime
+  notes String?
+
+  teamId String?
+  team   Team?   @relation(fields: [teamId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([teamId])
+  @@index([date])
+}
+
+model GameServer {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  name   String
+  game   Game
+  status ServerStatus @default(UNKNOWN)
+
+  host String
+  port Int?
+
+  // Sensitive; only ever exposed inside the auth-gated admin area.
+  serverPassword String?
+  rconPassword   String?
+
+  provider String?
+  location String?
+  notes    String?
+
+  teamId String?
+  team   Team?   @relation(fields: [teamId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([teamId])
+}
+
+model Player {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  userId String? @unique
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  firstName  String
+  lastName   String
+  gamertag   String
+  game       Game
+  inGameRole String?
+
+  faceitNickname String?
+
+  dateOfBirth DateTime?
+
+  licenseNumber    String?
+  licenseStatus    LicenseStatus @default(NONE)
+  licenseExpiresAt DateTime?
+
+  helloAssoMemberId String? @unique
+
+  teamId String?
+  team   Team?   @relation(fields: [teamId], references: [id], onDelete: SetNull)
+
+  contacts       Contact[]
+  availabilities Availability[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([teamId])
+  @@index([lastName, firstName])
+}
+
+model Staff {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  userId String? @unique
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  firstName String
+  lastName  String
+  role      StaffRole @default(OTHER)
+
+  teamId String?
+  team   Team?   @relation(fields: [teamId], references: [id], onDelete: SetNull)
+
+  contacts       Contact[]
+  availabilities Availability[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([teamId])
+  @@index([lastName, firstName])
+}
+
+model Contact {
+  id    String      @id @default(cuid())
+  type  ContactType
+  value String
+  label String?
+
+  playerId String?
+  player   Player? @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  staffId String?
+  staff   Staff?  @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([playerId])
+  @@index([staffId])
+}
+
+model Availability {
+  id String @id @default(cuid())
+
+  dayOfWeek Int // 0 = Sunday ... 6 = Saturday
+  startTime String // "HH:mm"
+  endTime   String // "HH:mm"
+  note      String?
+
+  playerId String?
+  player   Player? @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  staffId String?
+  staff   Staff?  @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([playerId])
+  @@index([staffId])
+}
