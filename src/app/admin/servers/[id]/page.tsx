@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/require-admin";
+import { decryptSecret } from "@/lib/crypto";
 import { ServerForm } from "../server-form";
 import { deleteServer, updateServer } from "../actions";
 
@@ -66,7 +67,7 @@ export default async function EditServerPage({
             {buildConnectCommand(
               server.host,
               server.port,
-              server.serverPassword,
+              decryptSecret(server.serverPassword),
             )}
           </pre>
         </section>

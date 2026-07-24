@@ -135,23 +135,37 @@ export function ServerForm({
       <div className="grid grid-cols-2 gap-4">
         <div className="flex flex-col gap-1">
           <label htmlFor="serverPassword" className="text-sm font-medium">
-            Mot de passe serveur (optionnel)
+            Mot de passe serveur{" "}
+            <span className="font-normal text-neutral-500">
+              {defaults?.serverPassword
+                ? "(défini — laisser vide pour conserver)"
+                : "(optionnel)"}
+            </span>
           </label>
           <input
             id="serverPassword"
             name="serverPassword"
-            defaultValue={defaults?.serverPassword ?? ""}
+            type="password"
+            autoComplete="off"
+            placeholder={defaults?.serverPassword ? "••••••••" : ""}
             className="rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900"
           />
         </div>
         <div className="flex flex-col gap-1">
           <label htmlFor="rconPassword" className="text-sm font-medium">
-            Mot de passe RCON (optionnel)
+            Mot de passe RCON{" "}
+            <span className="font-normal text-neutral-500">
+              {defaults?.rconPassword
+                ? "(défini — laisser vide pour conserver)"
+                : "(optionnel)"}
+            </span>
           </label>
           <input
             id="rconPassword"
             name="rconPassword"
-            defaultValue={defaults?.rconPassword ?? ""}
+            type="password"
+            autoComplete="off"
+            placeholder={defaults?.rconPassword ? "••••••••" : ""}
             className="rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900"
           />
         </div>

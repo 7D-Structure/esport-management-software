@@ -28,6 +28,15 @@ export default function Home() {
           </Link>
         </div>
       </main>
+      <footer className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 px-8 py-6 text-sm text-zinc-500">
+        <Link href="/legal/mentions-legales" className="hover:underline">
+          Mentions légales
+        </Link>
+        <span aria-hidden>·</span>
+        <Link href="/legal/confidentialite" className="hover:underline">
+          Politique de confidentialité
+        </Link>
+      </footer>
     </div>
   );
 }

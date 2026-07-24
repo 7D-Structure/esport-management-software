@@ -151,7 +151,12 @@ See `.env.example` for the global fallback variables.
 - **Storage**: a PostgreSQL database accessed through the Prisma ORM. The schema lives in
   `prisma/schema.prisma` and versioned SQL migrations in `prisma/migrations/`. The connection is
   configured via `DATABASE_URL` (e.g. Vercel Postgres / Neon in production). Account passwords are
-  **bcrypt-hashed**; they are never stored in clear text.
+  **bcrypt-hashed**; they are never stored in clear text. Secrets at rest (integration API keys,
+  server/RCON passwords) are **encrypted with AES-256-GCM** using `APP_ENCRYPTION_KEY` — values
+  without the encryption prefix are treated as legacy plaintext, so enabling the key is backward
+  compatible.
+- **Legal pages**: `/legal/mentions-legales` and `/legal/confidentialite` (public). Company and
+  host details live in `src/lib/legal.ts` — **fill in the SIREN/SIRET** there once available.
 - **Right to data portability**: from `/space/account`, a user can download all data tied to
   their account as a JSON file (`/space/account/export`).
 - **Right to erasure**: from `/space/account`, a user can delete their account after typing a

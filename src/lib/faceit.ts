@@ -7,9 +7,11 @@
 const FACEIT_BASE = "https://open.faceit.com/data/v4";
 const REQUEST_TIMEOUT_MS = 8000;
 
+import { decryptSecret } from "@/lib/crypto";
+
 // Resolve the API key for an organization, falling back to the global env var.
 export function resolveFaceitKey(orgKey?: string | null): string | null {
-  return orgKey || process.env.FACEIT_API_KEY || null;
+  return decryptSecret(orgKey) || process.env.FACEIT_API_KEY || null;
 }
 
 export function isFaceitConfigured(apiKey?: string | null): boolean {

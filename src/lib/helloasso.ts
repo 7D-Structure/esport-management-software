@@ -4,6 +4,8 @@
 // Uses the OAuth2 client-credentials flow. Fully optional: when the credentials
 // are unset, callers get a "not configured" result and the UI degrades.
 
+import { decryptSecret } from "@/lib/crypto";
+
 const REQUEST_TIMEOUT_MS = 10000;
 
 export type HelloAssoConfig = {
@@ -25,7 +27,8 @@ export function resolveHelloAssoConfig(org: {
 }): HelloAssoConfig | null {
   const clientId = org.helloAssoClientId || process.env.HELLOASSO_CLIENT_ID;
   const clientSecret =
-    org.helloAssoClientSecret || process.env.HELLOASSO_CLIENT_SECRET;
+    decryptSecret(org.helloAssoClientSecret) ||
+    process.env.HELLOASSO_CLIENT_SECRET;
   const orgSlug =
     org.helloAssoOrgSlug || process.env.HELLOASSO_ORGANIZATION_SLUG;
 

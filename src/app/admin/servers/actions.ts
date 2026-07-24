@@ -5,9 +5,12 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/require-admin";
 import { gameServerSchema } from "@/lib/validation";
+import { encryptSecret } from "@/lib/crypto";
 
+// Read the form, splitting out the secret password fields. Passwords use a
+// "blank = keep existing" convention and are encrypted at rest.
 function readServerForm(formData: FormData) {
-  return gameServerSchema.parse({
+  const parsed = gameServerSchema.parse({
     name: formData.get("name"),
     game: formData.get("game"),
     status: formData.get("status"),
@@ -20,14 +23,23 @@ function readServerForm(formData: FormData) {
     notes: formData.get("notes"),
     teamId: formData.get("teamId"),
   });
+
+  const { serverPassword, rconPassword, ...rest } = parsed;
+  const secrets = {
+    ...(serverPassword
+      ? { serverPassword: encryptSecret(serverPassword) }
+      : {}),
+    ...(rconPassword ? { rconPassword: encryptSecret(rconPassword) } : {}),
+  };
+  return { rest, secrets };
 }
 
 export async function createServer(formData: FormData) {
   const { organization } = await requireAdmin();
 
-  const data = readServerForm(formData);
+  const { rest, secrets } = readServerForm(formData);
   const server = await prisma.gameServer.create({
-    data: { ...data, organizationId: organization.id },
+    data: { ...rest, ...secrets, organizationId: organization.id },
   });
 
   revalidatePath("/admin/servers");
@@ -37,10 +49,11 @@ export async function createServer(formData: FormData) {
 export async function updateServer(serverId: string, formData: FormData) {
   const { organization } = await requireAdmin();
 
-  const data = readServerForm(formData);
+  const { rest, secrets } = readServerForm(formData);
+  // Secrets omitted when left blank, so existing values are preserved.
   await prisma.gameServer.updateMany({
     where: { id: serverId, organizationId: organization.id },
-    data,
+    data: { ...rest, ...secrets },
   });
 
   revalidatePath("/admin/servers");

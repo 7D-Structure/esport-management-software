@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/require-admin";
 import { canManageOrg } from "@/lib/org";
+import { encryptSecret } from "@/lib/crypto";
 
 function str(value: FormDataEntryValue | null): string {
   return typeof value === "string" ? value.trim() : "";
@@ -27,9 +28,11 @@ export async function updateIntegrations(formData: FormData) {
       // Non-secret fields: save as-is (blank clears them).
       helloAssoClientId: helloAssoClientId || null,
       helloAssoOrgSlug: helloAssoOrgSlug || null,
-      // Secret fields: only overwrite when a new value is provided.
-      ...(faceitApiKey ? { faceitApiKey } : {}),
-      ...(helloAssoClientSecret ? { helloAssoClientSecret } : {}),
+      // Secret fields: encrypted at rest, only overwritten when provided.
+      ...(faceitApiKey ? { faceitApiKey: encryptSecret(faceitApiKey) } : {}),
+      ...(helloAssoClientSecret
+        ? { helloAssoClientSecret: encryptSecret(helloAssoClientSecret) }
+        : {}),
     },
   });
 

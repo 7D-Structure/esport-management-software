@@ -126,6 +126,14 @@ export function RegisterForm() {
         {isPending ? "Création..." : "Créer mon compte"}
       </button>
 
+      <p className="text-center text-xs text-neutral-500">
+        En créant un compte, vous acceptez notre{" "}
+        <Link href="/legal/confidentialite" className="underline">
+          politique de confidentialité
+        </Link>
+        .
+      </p>
+
       <p className="text-center text-sm text-neutral-500">
         Déjà un compte ?{" "}
         <Link href="/login" className="font-medium underline">
